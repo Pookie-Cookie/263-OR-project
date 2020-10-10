@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import openrouteservice as ors
 import folium
+import random
 
 def partition(Locations):
     #Script that outputs lists of stores names after partitions are made across distribution centres
@@ -123,6 +124,8 @@ Create set of visited & unvisited
 
     #Loop until no nodes remain in unvisited set
     while len(unvisited) > 0:
+        #Shuffle unvisited set
+        random.shuffle(unvisited)
         #Initialize route: set starting point & total demand to 0
         route = [distribution_location]
         total_demand = 0
@@ -130,7 +133,7 @@ Create set of visited & unvisited
         #Set count for no. nodes popped to 0
         count = 0
         while (total_demand < 20) & (len(unvisited) > 0):
-            #Pop random node from set of unvisited nodes
+            #Pop first node from randomised set of unvisited nodes
             node = unvisited.pop()
             node_demand = demand_data[node]
 
