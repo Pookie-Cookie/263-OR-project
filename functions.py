@@ -244,21 +244,17 @@ Create set of visited & unvisited
 
     return routes
 
-def generate_demand_estimate(Locations):
+def generate_demand_estimate(Locations,demand):
 #This functions assigns a demand value for each store based on exploratory analysis 
-#To be adjusted in future
 
-    Location_names = Locations.Store.tolist()
-    demands = []
-    for name in Location_names:
-        if "The Warehouse" in name:
-            #Estimate average demand for warehouse = 4
-            demands.append(4)
-        else:
-            #Estimate average demand for Noel leeming = 6
-            demands.append(6)
+    #Combine store & location strings
+    data = demand[['Store','Location','Mean_Demand']]
+    data = data.to_numpy().tolist()
+    for i in range(len(data)):
+        data[i][0] = data[i][0] + " " + data[i][1] 
+        del data[i][1]
 
     #Create dictionary matching demands to the respective stores
-    demand_estimate = {Location_names[i]: demands[i] for i in range(len(demands))}
+    demand_estimate = {data[i][0]: data[i][1] for i in range(40)}
 
     return demand_estimate

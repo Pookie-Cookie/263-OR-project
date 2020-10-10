@@ -7,6 +7,7 @@ if __name__ == "__main__":
     #Load in data for warehouse locations and durations
     Locations = pd.read_csv('WarehouseLocations.csv')
     Durations = pd.read_csv('WarehouseDurations.csv')
+    Demands = pd.read_csv('dmnd_avgs.csv')
 
     #create pd.Series for store names so we can access index of stores from store name inputs
     store_index=[]
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     Partitions.extend(South_part_main)
 
     #Generate demand estimates for each node 
-    demand_data = generate_demand_estimate(Locations)
+    demand_data = generate_demand_estimate(Locations,Demands)
 
     #Generate List of routes for partitions
     no_generations = 100 #Change if we need more
