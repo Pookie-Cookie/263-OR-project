@@ -136,7 +136,7 @@ def cheapest_insertion(route,durations,route_index):
                 #inserts node at position
                 current_route.insert(i+1,destination)
                 #duration calc
-                current_duration = duration_calc(current_route,Durations,route_index)
+                current_duration = duration_calc(current_route,durations,route_index)
                 if current_duration < duration:
                     #when duration is at min, index and node are recorded
                     node = destination
@@ -148,7 +148,7 @@ def cheapest_insertion(route,durations,route_index):
         unvisited.remove(node)
 
     #calculates duration of route
-    total_duration = duration_calc(cheapest_route,Durations,route_index)
+    total_duration = duration_calc(cheapest_route,durations,route_index)
 
     #inserts distribution centre at end
     cheapest_route.insert(-1,cheapest_route[0])
