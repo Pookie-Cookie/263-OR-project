@@ -54,13 +54,25 @@ def partition(Locations):
     """
     return North,South
 
-def create_route(route):
-    #This function takes in list of nodes & orders the route to take the shortest distace/time travelled
-    #To be completed
+def cheapest_insertion(route):
+    '''
+    This function takes in list of node names & orders the route to take the shortest
+    distace/time travelled.
+    ------
+    Inputs:
 
+    route: array-like
+    List containing the names of the nodes
+    ------
+    Returns:
+    route: Arraylike:
+    List containing an array of ordered nodes by cheapest insertion, the total time taken
+    in the route
+
+    '''
     return route
 
-def route_gen(locations,partition,durations,demand_data):
+def route_gen(locations,distribution_location,partition,durations,demand_data):
     '''
 This function generates a set of feasible routes for a partition of stores(nodes)
 ------
@@ -71,6 +83,9 @@ Set of store location names in the partition
 
 locations: array-like
 dataframe containing the longitude and latitude values for the stores
+
+distribution_location: string
+Name of distribution centre used as origin of route
 
 durations: array-like
 dataframe containing the travel time between two stores
@@ -108,8 +123,8 @@ Create set of visited & unvisited
 
     #Loop until no nodes remain in unvisited set
     while len(unvisited) > 0:
-        #Initialize route: set starting point as south distribution centre & total demand to 0
-        route = [locations['Store'][0]]
+        #Initialize route: set starting point & total demand to 0
+        route = [distribution_location]
         total_demand = 0
 
         #Set count for no. nodes popped to 0
@@ -135,8 +150,8 @@ Create set of visited & unvisited
                 if count == len(unvisited):
                     break
         
-        #Create route from nodes in list
-        #route = create_route(route)                        
+        #Create cheapest insertion route from nodes in list
+        #route = cheapest_insertion(route)                        
 
         #add route to list
         routes.append(route)
@@ -154,7 +169,7 @@ def generate_demand_estimate(Locations):
             #Estimate average demand for warehouse = 4
             demands.append(4)
         else:
-            #Estimate average demand for warehouse = 4
+            #Estimate average demand for Noel leeming = 6
             demands.append(6)
 
     #Create dictionary matching demands to the respective stores
