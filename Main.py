@@ -9,7 +9,8 @@ if __name__ == "__main__":
 
     #Partition nodes into north & south groups with 3 subgroups in each
     North_part, South_part = partition(Locations)
-
+    Partitions = North_part.copy()
+    Partitions.extend(South_part)
     #Generate demand estimates for each node 
     demand_data = generate_demand_estimate(Locations)
     #Generate List of routes for partitions
@@ -19,22 +20,29 @@ if __name__ == "__main__":
     for part in North_part:
         #Create route from path & add to total set 
         routes = route_gen(Locations,'Distribution Nouth',part,Durations,demand_data)
-        feasible_routes.append(routes)
+        for route in routes:
+            feasible_routes.append(route)
      
-    for part in Sorth_part:
+    for part in South_part:
         #Create route from path & add to total set 
         routes = route_gen(Locations,'Distribution South',part,Durations,demand_data)
-        feasible_routes.append(routes)
+        for route in routes:
+            feasible_routes.append(route)
 
 
     #For scenario of closing Northen distribution centre
-    Partitions = North_part.extend(South_part)
     feasible_routes_south = []
-    
-    for part in Paritions:
+    North_part, South_part = partition(Locations)
+    Partitions = North_part.copy()
+    Partitions.extend(South_part)
+
+    for part in Partitions:
         #Create route from path & add to total set 
         routes = route_gen(Locations,'Distribution South',part,Durations,demand_data)
-        feasible_routes_south.append(routes)
+        for route in routes:
+            feasible_routes_south.append(route)
+
+    print()
 
 
 
