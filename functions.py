@@ -7,31 +7,36 @@ import random
 def partition(Locations):
     #Script that outputs lists of stores names after partitions are made across distribution centres
 
+    #records long and lat values of nodes
     coords = Locations[['Long', 'Lat']]
     coords = coords.to_numpy().tolist()
-    #print(Locations['Store'][0])
+
+    #computes long and lat values of distribution centres
     Southcoords = coords[0]
     Northcoords = coords[1]
+
+    #creates coords of a position exactly between distribution centres and gradient of a perpendicular lines to divide nodes
     Centrecoords = [(Southcoords[0]+Northcoords[0])/2,(Northcoords[1]+Southcoords[1])/2]
     m = 1/((Northcoords[1]-Southcoords[1])/(Southcoords[0]-Northcoords[0]))
 
-    #print(Centrecoords)
-    #print(m)
-
+    #create 3 empty sets for partitions of each distribution centre
     N1=[]
     N2=[]
     N3=[]
     S1=[]
     S2=[]
     S3=[]
+    #create set for sets
     North=[N1,N2,N3]
     South=[S1,S2,S3]
 
+    #iterate over all locations
     for i in range(len(Locations)):
         if Locations['Type'][i] == 'Distribution':
+            #ignore distribution centres
             pass
-            #print(Locations['Store'][i])
         elif Centrecoords[1] - Locations['Lat'][i] < m*(Centrecoords[0] - Locations['Long'][i]):
+            #divide northern nodes
             if Locations['Lat'][i] > Northcoords[1]:
                 N1.append(Locations['Store'][i])
             elif Locations['Long'][i] < Northcoords[0]:
@@ -39,23 +44,51 @@ def partition(Locations):
             elif Locations['Long'][i] > Northcoords[0]:
                 N3.append(Locations['Store'][i])
         else:
+            #divide southern nodes
             if Locations['Lat'][i] < Southcoords[1]:
                 S1.append(Locations['Store'][i])
             elif Locations['Long'][i] < Southcoords[0]:
                 S2.append(Locations['Store'][i])
             elif Locations['Long'][i] > Southcoords[0]:
                 S3.append(Locations['Store'][i])
-    """
-    for partitions in North:
-        print(len(partitions))
-    for partitions in South:
-        print(len(partitions))
-    print(North)
-    print(South)
-    """
+    
     return North,South
 
-def cheapest_insertion(route):
+def duration_calc(route,duration,route_index):
+    """
+    This function calculate the duration of a particular route, including the trip back to the starting point and unloading time
+
+    Inputs:
+
+    route: array-like
+    List containing the names of the nodes
+
+    durations: array-like
+    2D array containing travel time in seconds between nodes
+
+    route_index: array like
+    a pd.Series array giving corresponding index values for store names
+    ------
+    total_duration: int
+    duration in seconds of a given route
+    """
+    
+    #initialises duration at 0
+    total_duration = 0
+
+    #adds value of arc to duration
+    for i in range(len(route)-1):
+        total_duration += duration[route[i]][route_index[route[i+1]]]
+
+    #accounts for return to distribution centre
+    total_duration += duration[route[-1]][route_index[route[0]]]
+    #accounts for unloading at store
+    total_duration += 600 * (len(route)-1)
+    
+    return total_duration
+    
+
+def cheapest_insertion(route,durations,route_index):
     '''
     This function takes in list of node names & orders the route to take the shortest
     distace/time travelled.
@@ -64,14 +97,63 @@ def cheapest_insertion(route):
 
     route: array-like
     List containing the names of the nodes
+
+    durations: array-like
+    2D array containing travel time in seconds between nodes
+
+    route_index: array like
+    a pd.Series array giving corresponding index values for store names
     ------
     Returns:
     route: Arraylike:
-    List containing an array of ordered nodes by cheapest insertion, the total time taken
-    in the route
+    List containing an array of ordered nodes by cheapest insertion
 
+    total_duration: int
+    duration in seconds of the cheapest route via insertion sort
     '''
-    return route
+
+    #creates empty list for cheapest route
+    cheapest_route = []
+
+    #creates unvisted set
+    unvisited = route.copy()
+
+    #removes distibution centre from set and inserts to start of cheapest route
+    node = unvisited.pop(0)
+    cheapest_route.insert(0,node)
+
+    #while there are still unvisited nodes
+    while unvisited != []:
+        #creates temp route from current cheapest
+        current_route = cheapest_route.copy()
+        #presets duration to inf
+        duration = float('inf')
+
+        #iterates over unvisited nodes
+        for destination in unvisited:
+            #iterates over position of inserted node
+            for i in range(len(cheapest_route)):
+                #inserts node at position
+                current_route.insert(i+1,destination)
+                #duration calc
+                current_duration = duration_calc(current_route,Durations,route_index)
+                if current_duration < duration:
+                    #when duration is at min, index and node are recorded
+                    node = destination
+                    index = i + 1
+                #removes node for other iterations
+                current_route.remove(destination)
+        #inserts node into cheapest route and removes from unlisted
+        cheapest_route.insert(index,node)
+        unvisited.remove(node)
+
+    #calculates duration of route
+    total_duration = duration_calc(cheapest_route,Durations,route_index)
+
+    #inserts distribution centre at end
+    cheapest_route.insert(-1,cheapest_route[0])
+
+    return cheapest_route, total_duration
 
 def route_gen(locations,distribution_location,partition,durations,demand_data):
     '''
@@ -154,7 +236,7 @@ Create set of visited & unvisited
                     break
         
         #Create cheapest insertion route from nodes in list
-        #route = cheapest_insertion(route)                        
+        #route = cheapest_insertion(route,durations)                        
 
         #add route to list
         routes.append(route)

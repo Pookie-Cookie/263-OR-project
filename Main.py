@@ -7,6 +7,14 @@ if __name__ == "__main__":
     Locations = pd.read_csv('WarehouseLocations.csv')
     Durations = pd.read_csv('WarehouseDurations.csv')
 
+    #create pd.Series for store names so we can access index of stores from store name inputs
+    store_index=[]
+    for store in route:
+        for i in range(len(Locations['Store'])):
+            if Locations['Store'][i] == store:
+                store_index.append(i)
+    route_index = pd.Series(data=store_index, index = route)
+
     #Partition nodes into north & south groups with 3 subgroups in each
     North_part, South_part = partition(Locations)
     Partitions = North_part.copy()
