@@ -27,13 +27,13 @@ if __name__ == "__main__":
     feasible_routes = []
     for part in North_part:
         #Create route from path & add to total set 
-        routes = route_gen(Locations,'Distribution Nouth',part,Durations,demand_data)
+        routes = route_gen(Locations,'Distribution North',part,Durations,demand_data,route_index)
         for route in routes:
             feasible_routes.append(route)
      
     for part in South_part:
         #Create route from path & add to total set 
-        routes = route_gen(Locations,'Distribution South',part,Durations,demand_data)
+        routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
         for route in routes:
             feasible_routes.append(route)
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     for part in Partitions:
         #Create route from path & add to total set 
-        routes = route_gen(Locations,'Distribution South',part,Durations,demand_data)
+        routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
         for route in routes:
             feasible_routes_south.append(route)
 

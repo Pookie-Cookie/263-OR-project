@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-import openrouteservice as ors
-import folium
+#import openrouteservice as ors
+#import folium
 import random
 
 def partition(Locations):
@@ -149,13 +149,14 @@ def cheapest_insertion(route,durations,route_index):
 
     #calculates duration of route
     total_duration = duration_calc(cheapest_route,durations,route_index)
-
     #inserts distribution centre at end
-    cheapest_route.insert(-1,cheapest_route[0])
+    cheapest_route.insert(len(cheapest_route),cheapest_route[0])
 
-    return cheapest_route, total_duration
+    route_info = [cheapest_route, total_duration]
 
-def route_gen(locations,distribution_location,partition,durations,demand_data):
+    return route_info
+
+def route_gen(locations,distribution_location,partition,durations,demand_data,route_index):
     '''
 This function generates a set of feasible routes for a partition of stores(nodes)
 ------
@@ -195,7 +196,7 @@ Create set of visited & unvisited
 ------
     '''
     #Insert client key to OperRouteService
-    client = ors.Client(key = '5b3ce3597851110001cf6248847e5e8faea24926a0ae948072d56e5b')
+    #client = ors.Client(key = '5b3ce3597851110001cf6248847e5e8faea24926a0ae948072d56e5b')
 
     #Create set of unvisited & visited nodes
     unvisited = partition
@@ -236,7 +237,7 @@ Create set of visited & unvisited
                     break
         
         #Create cheapest insertion route from nodes in list
-        #route = cheapest_insertion(route,durations)                        
+        route = cheapest_insertion(route,durations,route_index)                        
 
         #add route to list
         routes.append(route)
