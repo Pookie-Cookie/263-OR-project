@@ -86,7 +86,15 @@ if __name__ == "__main__":
     #Separate the routes & respective costs from the feasible_route data format
     for route in feasible_routes:   
         Patterns.append(route[0])
-        Pattern_costs.append(route[1])
+        costs = 0
+        #calculate the costs of the routes
+        if route[1] > 14400:
+            costs = 174*4
+            costs += (route[1]-14400)%3600*250
+        else:
+            costs = route[1]%3600*175
+
+        Pattern_costs.append(costs)
 
     #Transform route patterns into format usable by linear program
     for i in range(len(Patterns)):
