@@ -21,14 +21,14 @@ if __name__ == "__main__":
                 store_index.append(i)
     route_index = pd.Series(data=store_index, index = Locations['Store'])
 
+    #Generate List of routes for partitions
+    no_generations = 2 #Change if we need more
+
+    
     #Partition nodes into north & south groups with 3 subgroups in each
     North_part_main, South_part_main = partition(Locations)
     Partitions = North_part_main.copy()
     Partitions.extend(South_part_main)
-
-    #Generate List of routes for partitions
-    no_generations = 2 #Change if we need more
-
 
     #Create route storage for linear progam with both distribution centres
     feasible_routes = []
@@ -48,6 +48,7 @@ if __name__ == "__main__":
             routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
             for route in routes:
                 feasible_routes.append(route)
+    
 
     '''
     #For scenario of closing Northen distribution centre
@@ -65,6 +66,57 @@ if __name__ == "__main__":
                 feasible_routes_south.append(route)
     '''
 
+    """
+    ALTERNATIVE ROUTE GEN - attempts 50 routes < 4 hours before assigning additional stores to trucks then adds wet leased routes
+    
+    partitions_main,stores_main = partition_alt(Locations)
+
+    distribution = ['Distribution North','Distribution South']
+
+    feasible_routes = []
+
+    for j in range(no_generations):
+        partitions=deepcopy(partitions_main) 
+        stores=deepcopy(stores_main) 
+        N1routes = []
+        S1routes = []
+        N2routes = []
+        S2routes = []
+        N3routes = []
+        S3routes = []
+
+        routes = [N1routes,S1routes,N2routes,S2routes,N3routes,S3routes]
+
+        count = 0
+        while stores != []:
+            for i in range(200):
+                if (partitions[i%6] != []) & (count < 50):
+                    random.shuffle(partitions[i%6])
+                    route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                    routes[i%6].append(route)
+                    count += 1
+                elif (partitions[i%6] != []) & (count == 50):
+                    for store in partitions:
+                        for route in routes[i%6]:
+                            route.append(store)
+
+                            route_duration = cheapest_insertion(route,Durations,demand_data,route_index)
+                            demand=demand_calc(route,demand_data)
+                            if (demand <= 20) & (route_duration[1] <= 21600):
+                                stores.remove(store)
+                                partitions[i%6].remove(store)
+                                break
+                            else:
+                                route.remove(store)
+                    if partitions[i%6] != []:
+                        random.shuffle(partitions[i%6])
+                        route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                        routes[i%6].append(route)
+        
+        for partition in routes:
+            for route in partition:
+                feasible_routes.append(route)
+    """
 
     #LP formulation
 

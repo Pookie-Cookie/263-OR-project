@@ -154,7 +154,6 @@ def cheapest_insertion(route,durations,route_index,demand_data):
     #calculates duration of route
     total_duration = duration_calc(cheapest_route,durations,route_index,demand_data)
     #inserts distribution centre at end
-    cheapest_route.insert(len(cheapest_route),cheapest_route[0])
 
     route_info = [cheapest_route, total_duration]
 
@@ -224,16 +223,20 @@ Create set of visited & unvisited
             node = unvisited.pop()
             node_demand = demand_data[node]
 
-            if total_demand + node_demand <= 20:
+            #add node to route preemptively to test for durations
+            route.append(node)
+            route_duration = cheapest_insertion(route,durations,route_index,demand_data)
+
+            if (total_demand + node_demand <= 20) & (route_duration[1] <= 21600):
                 #Adding node does not exceed demand, add node to route & set of visited nodes
                 total_demand = total_demand + node_demand
                 visited.add(node)
-                route.append(node)
-
+                
                 #Reset popped node counter
                 count = 0
             else:
                 #Adding node back to set of unvisited as adding causes excess demand
+                route.remove(node)
                 unvisited.append(node)
                 count = count + 1
                 #When adding any node causes exceeding of truck capacity, break loop & complete route
@@ -262,3 +265,143 @@ def generate_demand_estimate(Locations,demand):
     demand_estimate = {data[i][0]: data[i][1] for i in range(40)}
 
     return demand_estimate
+
+def partition_alt(Locations):
+    #Script that outputs lists of stores names after partitions are made across distribution centres
+
+    #records long and lat values of nodes
+    coords = Locations[['Long', 'Lat']]
+    coords = coords.to_numpy().tolist()
+
+    #computes long and lat values of distribution centres
+    Southcoords = coords[0]
+    Northcoords = coords[1]
+
+    #creates coords of a position exactly between distribution centres and gradient of a perpendicular lines to divide nodes
+    Centrecoords = [(Southcoords[0]+Northcoords[0])/2,(Northcoords[1]+Southcoords[1])/2]
+    m = 1/((Northcoords[1]-Southcoords[1])/(Southcoords[0]-Northcoords[0]))
+
+    #create 3 empty sets for partitions of each distribution centre
+    N1=[]
+    N2=[]
+    N3=[]
+    S1=[]
+    S2=[]
+    S3=[]
+    #create set main set
+    partitions=[N1,S1,N2,S2,N3,S3]
+    stores=[]
+
+    #iterate over all locations
+    for i in range(len(Locations)):
+        if Locations['Type'][i] == 'Distribution':
+            #ignore distribution centres
+            pass
+        elif Centrecoords[1] - Locations['Lat'][i] < m*(Centrecoords[0] - Locations['Long'][i]):
+            #divide northern nodes
+            stores.append(Locations['Store'][i])
+            if Locations['Lat'][i] > Northcoords[1]:
+                N1.append(Locations['Store'][i])
+            elif Locations['Long'][i] < Northcoords[0]:
+                N2.append(Locations['Store'][i])
+            elif Locations['Long'][i] > Northcoords[0]:
+                N3.append(Locations['Store'][i])
+        else:
+            #divide southern nodes
+            stores.append(Locations['Store'][i])
+            if Locations['Lat'][i] < Southcoords[1]:
+                S1.append(Locations['Store'][i])
+            elif Locations['Long'][i] < Southcoords[0]:
+                S2.append(Locations['Store'][i])
+            elif Locations['Long'][i] > Southcoords[0]:
+                S3.append(Locations['Store'][i])
+    
+    return partitions,stores
+
+def route_gen_single(locations,distribution_location,partition,stores,durations,demand_data,route_index):
+    '''
+This function generates a set of feasible routes for a partition of stores(nodes)
+------
+Inputs
+
+partition: Set
+Set of store location names in the partition
+
+locations: array-like
+dataframe containing the longitude and latitude values for the stores
+
+distribution_location: string
+Name of distribution centre used as origin of route
+
+durations: array-like
+dataframe containing the travel time between two stores
+
+demand_data: dictionary
+dictionary matching the store name to the estimated demand for the store
+------
+Outputs
+
+routes: array-like
+List of routes generated from the partition. (Routes are a list of nodes in order of travel)
+------
+Pesudocode for route generation
+
+Create set of visited & unvisited
+       While there are still unvisited nodes in the partition:
+           Create a route with starting node at distribution centre:
+           While total demand in route <20:
+               Select random node in partition
+               If adding node's demand does not exceed toal demand of 20:
+                   add node into route & add its estimated demand to route
+                   move added node from unvisited to visited in partition
+           Save route to list of routes
+------
+    '''
+    #Insert client key to OperRouteService
+    #client = ors.Client(key = '5b3ce3597851110001cf6248847e5e8faea24926a0ae948072d56e5b')
+
+    #Shuffle unvisited set
+    random.shuffle(partition)
+    #Initialize route: set starting point & total demand to 0
+    route = [distribution_location]
+    total_demand = 0
+
+    #Set count for no. nodes popped to 0
+    count = 0
+    while (total_demand < 20) & (len(partition) > 0):
+        #Pop first node from randomised set of unvisited nodes
+        node = partition.pop()
+        node_demand = demand_data[node]
+
+        #add node to route preemptively to test for durations
+        route.append(node)
+        route_duration = cheapest_insertion(route,durations,route_index,demand_data)
+
+        if (total_demand + node_demand <= 20) & (route_duration[1] <= 14400):
+            #Adding node does not exceed demand, add node to route & set of visited nodes
+            total_demand = total_demand + node_demand
+            stores.remove(node)
+            #Reset popped node counter
+            count = 0
+        else:
+            #Adding node back to set of unvisited as adding causes excess demand
+            route.remove(node)
+            partition.append(node)
+            count = count + 1
+            #When adding any node causes exceeding of truck capacity, break loop & complete route
+            if count == len(partition):
+                break
+        
+    #Create cheapest insertion route from nodes in list
+    route = cheapest_insertion(route,durations,route_index,demand_data)                        
+
+    return route
+
+def demand_calc(route,demand_data):
+
+    demand = 0
+    for store in route:
+        if (store != 'Distribution North') & store != 'Distribution South':
+            demand += demand_data[store]
+    
+    return demand
