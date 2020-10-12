@@ -180,8 +180,10 @@ if __name__ == "__main__":
 
 
         #Create problem variable
-        prob = LpProblem('The truck routing problem ' + str(i),LpMinimize)
-
+        if i == 0:
+            prob = LpProblem('The truck routing problem (both distribution centres)',LpMinimize)
+        else:
+            prob = LpProblem('The truck routing problem (closed north centre)',LpMinimize)
         #Objective function: minimising chosen routes x cost of each chosen route
         prob += lpSum(vars[j] * Pattern_costs[j] for j in Pattern_names), "routing cost"
 
@@ -190,7 +192,10 @@ if __name__ == "__main__":
             #Selected route must pass through all nodes
             prob += lpSum([vars[j] * Patterns[j][node] for j in Pattern_names]) == 1, "Satisfying demand for " + node
 
-        prob.writeLP("TruckRoutingProblem.lp" + str(i))
+        if i == 0:
+            prob.writeLP("TRP_both_centres.lp")
+        else:
+            prob.writeLP("TRP_south_only.lp")
     
         prob.solve()
     
