@@ -22,7 +22,7 @@ if __name__ == "__main__":
     route_index = pd.Series(data=store_index, index = Locations['Store'])
 
     #Generate List of routes for partitions
-    no_generations = 50 #Change if we need more
+    no_generations = 2 #Change if we need more
 
     
     #Partition nodes into north & south groups with 3 subgroups in each
@@ -177,7 +177,8 @@ if __name__ == "__main__":
 
         #Create binary problem variables
         vars = LpVariable.dicts("Pattern", Pattern_names, 0, 1, LpInteger)
-
+        extra_trucks = LpVariable("Extra trucks", 0, 5, LpInteger)
+        wet_leases = LpVariable("Wet Leases", 0, 9999, LpInteger)
 
         #Create problem variable
         if i == 0:
@@ -185,12 +186,16 @@ if __name__ == "__main__":
         else:
             prob = LpProblem('The truck routing problem (closed north centre)',LpMinimize)
         #Objective function: minimising chosen routes x cost of each chosen route
-        prob += lpSum(vars[j] * Pattern_costs[j] for j in Pattern_names), "routing cost"
+        prob += lpSum(vars[j] * Pattern_costs[j] for j in Pattern_names) + wet_leases*1500 + extra_trucks*20000/30, "routing cost"
 
         #demand minimum constraint
         for node in Node_names:
             #Selected route must pass through all nodes
             prob += lpSum([vars[j] * Patterns[j][node] for j in Pattern_names]) == 1, "Satisfying demand for " + node
+
+        num_shifts = 50 
+
+        prob += lpSum(vars) <= num_shifts + extra_trucks*2 + wet_leases, "max number of shifts"
 
         if i == 0:
             prob.writeLP("TRP_both_centres.lp")
