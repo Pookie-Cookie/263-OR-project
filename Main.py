@@ -22,7 +22,7 @@ if __name__ == "__main__":
     route_index = pd.Series(data=store_index, index = Locations['Store'])
 
     #Generate List of routes for partitions
-    no_generations = 2 #Change if we need more
+    no_generations = 50 #Change if we need more
 
     
     #Partition nodes into north & south groups with 3 subgroups in each
@@ -30,15 +30,10 @@ if __name__ == "__main__":
     Partitions = North_part_main.copy()
     Partitions.extend(South_part_main)
 
-<<<<<<< HEAD
-    #Generate List of routes for partitions
-    no_generations = 20 #Change if we need more
-
-
-=======
->>>>>>> b59bb000f7f28bdf2778de694d46848191e43ee6
     #Create route storage for linear progam with both distribution centres
-    feasible_routes = []
+    feasible_routes = [[],[]] #[0] = both centres [1] = closed north centre
+
+
     for i in range(no_generations): 
         #Deepcopy by value as parition nodes are popped during each cycle
         North_part = deepcopy(North_part_main)
@@ -48,18 +43,17 @@ if __name__ == "__main__":
             #Create route from path & add to total set 
             routes = route_gen(Locations,'Distribution North',part,Durations,demand_data,route_index)
             for route in routes:
-                feasible_routes.append(route)
+                feasible_routes[0].append(route)
      
         for part in South_part:
             #Create route from path & add to total set 
             routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
             for route in routes:
-                feasible_routes.append(route)
+                feasible_routes[0].append(route)
     
 
-    '''
+    
     #For scenario of closing Northen distribution centre
-    feasible_routes_south = []
     North_part, South_part = partition(Locations)
     Partitions_main = North_part.copy()
     Partitions_main.extend(South_part)
@@ -70,11 +64,11 @@ if __name__ == "__main__":
         #Create route from path & add to total set 
             routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
             for route in routes:
-                feasible_routes_south.append(route)
-    '''
+                feasible_routes[1].append(route)
+    
 
-    """
-    ALTERNATIVE ROUTE GEN - attempts 50 routes < 4 hours before assigning additional stores to trucks then adds wet leased routes
+    '''
+    #ALTERNATIVE ROUTE GEN - attempts 50 routes < 4 hours before assigning additional stores to trucks then adds wet leased routes
     
     partitions_main,stores_main = partition_alt(Locations)
 
@@ -95,13 +89,18 @@ if __name__ == "__main__":
         routes = [N1routes,S1routes,N2routes,S2routes,N3routes,S3routes]
 
         count = 0
+
+        #Loop until no store remains unvisited
         while stores != []:
             for i in range(200):
+                #Arrangement for all shifts of our avalible 25 trucks: add route to each shift at $175/hr
                 if (partitions[i%6] != []) & (count < 50):
+                    #Randomise selection of node in partition before generating route
                     random.shuffle(partitions[i%6])
                     route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
                     routes[i%6].append(route)
                     count += 1
+                #Arrangement when all shifts are factored in: attempt to fit stores in existing shifts using additional hours at $250/hr
                 elif (partitions[i%6] != []) & (count == 50):
                     for store in partitions:
                         for route in routes[i%6]:
@@ -119,11 +118,12 @@ if __name__ == "__main__":
                         random.shuffle(partitions[i%6])
                         route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
                         routes[i%6].append(route)
-        
+
+        #Collect all routes into list
         for partition in routes:
             for route in partition:
                 feasible_routes.append(route)
-    """
+    '''
 
     #LP formulation
 
@@ -134,73 +134,76 @@ if __name__ == "__main__":
     #Get dictionary of node names to its respective demand  
     Node_demands = generate_demand_estimate(Locations, Demands)
 
-    #Create pattern names
-    Pattern_names = []
-    Patterns = []
-    Pattern_costs = []
+    #Separate formulation for the two scenarios
+    for i in range (len(feasible_routes)):
+        #Create pattern names
+        Pattern_names = []
+        Patterns = []
+        Pattern_costs = []
 
-    #Assigning numerical names to each of the routes
-    for i in range(len(feasible_routes)):
-        Pattern_names.append(str(i))
+        #Assigning numerical names to each of the routes
+        for j in range(len(feasible_routes[i])):
+            Pattern_names.append(str(j))
 
-    #Separate the routes & respective costs from the feasible_route data format
-    for route in feasible_routes:   
-        Patterns.append(route[0])
-        costs = 0
-        #calculate the costs of the routes
-        if route[1] > 14400:
-            costs = 175*4
-            costs += math.ceil((route[1]-14400)/3600)*250
-        else:
-            costs = math.ceil(route[1]/3600)*175
+        #Separate the routes & respective costs from the feasible_route data format
+        for route in feasible_routes[i]:   
+            Patterns.append(route[0])
+            costs = 0
+            #calculate the costs of the routes
+            if route[1] > 14400:
+                costs = 175*4
+                costs += math.ceil((route[1]-14400)/3600)*250
+            else:
+                costs = math.ceil(route[1]/3600)*175
 
-        Pattern_costs.append(costs)
+            Pattern_costs.append(costs)
 
-    #Transform route patterns into format usable by linear program
-    for i in range(len(Patterns)):
-        #List of 40 binarys representing if a store has been visited matching the order of store names.
-        new_format = np.zeros((40,), dtype=int)
-        for j in range(len(Node_names)):
-            #If route contains store, set visited to one
-            if Node_names[j] in Patterns[i]:
-                new_format[j] = 1
-        Patterns[i] = new_format
-
-
-    #Make dictionary of the routes, the route name & store names
-    Patterns = makeDict([Pattern_names,Node_names], Patterns, 0)
-
-    #Make dictionary of routes to their respective costs
-    Pattern_costs = {Pattern_names[i]:Pattern_costs[i] for i in range(len(Pattern_names))}
-
-    #Create binary problem variables
-    vars = LpVariable.dicts("Pattern", Pattern_names, 0, 1, LpInteger)
+        #Transform route patterns into format usable by linear program
+        for j in range(len(Patterns)):
+            #List of 40 binarys representing if a store has been visited matching the order of store names.
+            new_format = np.zeros((40,), dtype=int)
+            for k in range(len(Node_names)):
+                #If route contains store, set visited to one
+                if Node_names[k] in Patterns[j]:
+                    new_format[k] = 1
+            Patterns[j] = new_format
 
 
-    #Create problem variable
-    prob = LpProblem('The truck routing problem',LpMinimize)
+        #Make dictionary of the routes, the route name & store names
+        Patterns = makeDict([Pattern_names,Node_names], Patterns, 0)
 
-    #Objective function: minimising chosen routes x cost of each chosen route
-    prob += lpSum(vars[i] * Pattern_costs[i] for i in Pattern_names), "routing cost"
+        #Make dictionary of routes to their respective costs
+        Pattern_costs = {Pattern_names[j]:Pattern_costs[j] for j in range(len(Pattern_names))}
 
-    #demand minimum constraint
-    for node in Node_names:
-        #Selected route must pass through all nodes
-        prob += lpSum([vars[j] * Patterns[j][node] for j in Pattern_names]) == 1, "Satisfying demand for " + node
+        #Create binary problem variables
+        vars = LpVariable.dicts("Pattern", Pattern_names, 0, 1, LpInteger)
 
+
+        #Create problem variable
+        prob = LpProblem('The truck routing problem ' + str(i),LpMinimize)
+
+        #Objective function: minimising chosen routes x cost of each chosen route
+        prob += lpSum(vars[j] * Pattern_costs[j] for j in Pattern_names), "routing cost"
+
+        #demand minimum constraint
+        for node in Node_names:
+            #Selected route must pass through all nodes
+            prob += lpSum([vars[j] * Patterns[j][node] for j in Pattern_names]) == 1, "Satisfying demand for " + node
+
+        prob.writeLP("TruckRoutingProblem.lp" + str(i))
     
-    prob.writeLP("TruckRoutingProblem.lp")
+        prob.solve()
     
-    prob.solve()
+        #print("Status:", LpStatus[prob.status])
     
-    print("Status:", LpStatus[prob.status])
-    
-    print("Selected route / cost in $")
-    for v in prob.variables():
-        if v.varValue == 1:
-            print(v.name, "=", Pattern_costs[v.name[8:]])
-            
-    print("Total routing Costs = ", value(prob.objective))
+        print("Selected route / cost in $")
+        count = 0
+        for v in prob.variables():
+            if v.varValue == 1:
+                count = count + 1
+                print(v.name, "=", Pattern_costs[v.name[8:]])
+        print("Total no. truck shifts = ", count)
+        print("Total routing Costs = ", value(prob.objective))
     
 
     
