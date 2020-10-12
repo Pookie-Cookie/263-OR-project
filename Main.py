@@ -27,7 +27,7 @@ if __name__ == "__main__":
     Partitions.extend(South_part_main)
 
     #Generate List of routes for partitions
-    no_generations = 2 #Change if we need more
+    no_generations = 20 #Change if we need more
 
 
     #Create route storage for linear progam with both distribution centres
@@ -136,10 +136,12 @@ if __name__ == "__main__":
     
     print("Status:", LpStatus[prob.status])
     
+    print("Selected route / cost in $")
     for v in prob.variables():
-        print(v.name, "=", v.varValue)
-
-    print("Routing Costs = ", value(prob.objective))
+        if v.varValue == 1:
+            print(v.name, "=", Pattern_costs[v.name[8:]])
+            
+    print("Total routing Costs = ", value(prob.objective))
     
 
     
