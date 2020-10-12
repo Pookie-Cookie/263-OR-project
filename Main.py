@@ -1,6 +1,6 @@
 from functions import *
 from copy import deepcopy
-
+from pulp import *
 
 if __name__ == "__main__":
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     demand_data = generate_demand_estimate(Locations,Demands)
 
     #Generate List of routes for partitions
-    no_generations = 100 #Change if we need more
+    no_generations = 2 #Change if we need more
 
 
     #Create route storage for linear progam with both distribution centres
@@ -48,7 +48,7 @@ if __name__ == "__main__":
             for route in routes:
                 feasible_routes.append(route)
 
-
+    '''
     #For scenario of closing Northen distribution centre
     feasible_routes_south = []
     North_part, South_part = partition(Locations)
@@ -62,30 +62,75 @@ if __name__ == "__main__":
             routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
             for route in routes:
                 feasible_routes_south.append(route)
-
-    print()
-
+    '''
 
 
+    #LP formulation
 
 
-    #get path
-    #print(route['features'][0]['geometry']['coordinates']
-    #get route distance
-    #print(route['features'][0]['properties']['summary']['distance'])
-    #get route duration
-    #print(route['features'][0]['properties']['summary']['duration'])
+    #Get List of node names: 
+    Node_names = Locations['Store'][2:].to_numpy().tolist()
+
+    #Get dictionary of node names to its respective demand  
+    Node_demands = generate_demand_estimate(Locations, Demands)
+
+    #Create pattern names
+    Pattern_names = []
+    Patterns = []
+    Pattern_costs = []
+
+    #Assigning numerical names to each of the routes
+    for i in range(len(feasible_routes)):
+        Pattern_names.append(str(i))
+
+    #Separate the routes & respective costs from the feasible_route data format
+    for route in feasible_routes:   
+        Patterns.append(route[0])
+        Pattern_costs.append(route[1])
+
+    #Transform route patterns into format usable by linear program
+    for i in range(len(Patterns)):
+        #List of 40 binarys representing if a store has been visited matching the order of store names.
+        new_format = np.zeros((40,), dtype=int)
+        for j in range(len(Node_names)):
+            #If route contains store, set visited to one
+            if Node_names[j] in Patterns[i]:
+                new_format[j] = 1
+        Patterns[i] = new_format
 
 
+    #Make dictionary of the routes, the route name & store names
+    Patterns = makeDict([Pattern_names,Node_names], Patterns, 0)
 
+    #Make dictionary of routes to their respective costs
+    Pattern_costs = {Pattern_names[i]:Pattern_costs[i] for i in range(len(Pattern_names))}
 
-    #coords = Locations[['Long', 'Lat']] 
-    #coords = coords.to_numpy().tolist()
+    #Create binary problem variables
+    Vars = LpVariable.dicts("Pattern", Pattern_names, 0, 1, LpInteger)
+
+    #Create problem variable
+    prob = LpProblem('The truck routing problem',LpMinimize)
+
+    #Objective function: minimising chosen routes x cost of each chosen route
+    prob += lpSum(Vars[i] * Pattern_costs[i] for i in Pattern_names), "routing cost"
+
+    #demand minimum constraint
+    for node in Node_names:
+        #Selected route must pass through all nodes
+        prob += lpSum([Vars[j]*Patterns[node][j] for j in Pattern_names]) >= 1, "Satisfying demand for " + node
+
     
-    #generate routes
-    #route = client.directions(coordinates = [coords[0],coords[18]],profile = 'driving-hgv', format = 'geojson', validate = False)
+    prob.writeLP("TruckRoutingProblem.lp")
+    '''
+    prob.solve()
+    
+    print("Status:", LpStatus[prob.status])
+    
+    for v in prob.variables():
+        print(v.name, "=", v.varValue)
 
+    print("Routing Costs = ", value(prob.objective))
+    '''
 
-
-
+    
 
