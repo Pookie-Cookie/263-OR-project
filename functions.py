@@ -56,7 +56,7 @@ def partition(Locations):
 
 
 
-def duration_calc(route,duration,route_index):
+def duration_calc(route,duration,route_index,demand_data):
     """
     This function calculate the duration of a particular route, including the trip back to the starting point and unloading time
 
@@ -78,19 +78,18 @@ def duration_calc(route,duration,route_index):
     #initialises duration at 0
     total_duration = 0
 
-    #adds value of arc to duration
+    #adds value of arc to duration and 10 mins per pallet
     for i in range(len(route)-1):
-        total_duration += duration[route[i]][route_index[route[i+1]]]
+        total_duration += duration[route[i]][route_index[route[i+1]]] + 600*demand_data[route[i+1]]
 
     #accounts for return to distribution centre
     total_duration += duration[route[-1]][route_index[route[0]]]
     #accounts for unloading at store
-    total_duration += 600 * (len(route)-1)
     
     return total_duration
     
 
-def cheapest_insertion(route,durations,route_index):
+def cheapest_insertion(route,durations,route_index,demand_data):
     '''
     This function takes in list of node names & orders the route to take the shortest
     distace/time travelled.
@@ -105,6 +104,9 @@ def cheapest_insertion(route,durations,route_index):
 
     route_index: array like
     a pd.Series array giving corresponding index values for store names
+
+    demand_data: dictionary
+    dictionary matching the store name to the estimated demand for the store
     ------
     Returns:
     route: Arraylike:
@@ -138,7 +140,7 @@ def cheapest_insertion(route,durations,route_index):
                 #inserts node at position
                 current_route.insert(i+1,destination)
                 #duration calc
-                current_duration = duration_calc(current_route,durations,route_index)
+                current_duration = duration_calc(current_route,durations,route_index,demand_data)
                 if current_duration < duration:
                     #when duration is at min, index and node are recorded
                     node = destination
@@ -150,7 +152,7 @@ def cheapest_insertion(route,durations,route_index):
         unvisited.remove(node)
 
     #calculates duration of route
-    total_duration = duration_calc(cheapest_route,durations,route_index)
+    total_duration = duration_calc(cheapest_route,durations,route_index,demand_data)
     #inserts distribution centre at end
     cheapest_route.insert(len(cheapest_route),cheapest_route[0])
 
@@ -239,7 +241,7 @@ Create set of visited & unvisited
                     break
         
         #Create cheapest insertion route from nodes in list
-        route = cheapest_insertion(route,durations,route_index)                        
+        route = cheapest_insertion(route,durations,route_index,demand_data)                        
 
         #add route to list
         routes.append(route)
