@@ -1,0 +1,221 @@
+Day,Store,Location,Mean_Demand
+Mon,Noel Leeming,Albany,5
+Mon,Noel Leeming,Botany,5
+Mon,Noel Leeming,Glenfield Clearance,4
+Mon,Noel Leeming,Henderson,3
+Mon,Noel Leeming,Lunn Avenue,4
+Mon,Noel Leeming,Manukau Supa Centre,5
+Mon,Noel Leeming,Manukau Westfield,5
+Mon,Noel Leeming,Massey,5
+Mon,Noel Leeming,New Lynn,5
+Mon,Noel Leeming,Newmarket,5
+Mon,Noel Leeming,Ormiston,5
+Mon,Noel Leeming,Papakura,4
+Mon,Noel Leeming,Papatoetoe,4
+Mon,Noel Leeming,Penrose Clearance,5
+Mon,Noel Leeming,Queen Street,5
+Mon,Noel Leeming,Royal Oak,4
+Mon,Noel Leeming,St Lukes Mega,6
+Mon,Noel Leeming,St Lukes Westfield,4
+Mon,Noel Leeming,Sylvia Park,5
+Mon,Noel Leeming,Wairau Park,4
+Mon,The Warehouse,Airport,6
+Mon,The Warehouse,Albany,6
+Mon,The Warehouse,Atrium,7
+Mon,The Warehouse,Botany Downs,5
+Mon,The Warehouse,Clendon,6
+Mon,The Warehouse,Glenfield Mall,8
+Mon,The Warehouse,Lincoln Road,6
+Mon,The Warehouse,Lunn Avenue,6
+Mon,The Warehouse,Manukau,7
+Mon,The Warehouse,Milford,5
+Mon,The Warehouse,Mt Roskill,7
+Mon,The Warehouse,New Lynn,8
+Mon,The Warehouse,Newmarket,8
+Mon,The Warehouse,Pakuranga,6
+Mon,The Warehouse,Royal Oak,8
+Mon,The Warehouse,St Lukes,7
+Mon,The Warehouse,Sylvia Park,7
+Mon,The Warehouse,Takanini,8
+Mon,The Warehouse,WestCity,8
+Mon,The Warehouse,Westgate,8
+Tue,Noel Leeming,Albany,4
+Tue,Noel Leeming,Botany,5
+Tue,Noel Leeming,Glenfield Clearance,4
+Tue,Noel Leeming,Henderson,5
+Tue,Noel Leeming,Lunn Avenue,4
+Tue,Noel Leeming,Manukau Supa Centre,6
+Tue,Noel Leeming,Manukau Westfield,4
+Tue,Noel Leeming,Massey,3
+Tue,Noel Leeming,New Lynn,6
+Tue,Noel Leeming,Newmarket,4
+Tue,Noel Leeming,Ormiston,6
+Tue,Noel Leeming,Papakura,5
+Tue,Noel Leeming,Papatoetoe,5
+Tue,Noel Leeming,Penrose Clearance,4
+Tue,Noel Leeming,Queen Street,7
+Tue,Noel Leeming,Royal Oak,5
+Tue,Noel Leeming,St Lukes Mega,6
+Tue,Noel Leeming,St Lukes Westfield,4
+Tue,Noel Leeming,Sylvia Park,5
+Tue,Noel Leeming,Wairau Park,6
+Tue,The Warehouse,Airport,6
+Tue,The Warehouse,Albany,6
+Tue,The Warehouse,Atrium,7
+Tue,The Warehouse,Botany Downs,7
+Tue,The Warehouse,Clendon,7
+Tue,The Warehouse,Glenfield Mall,6
+Tue,The Warehouse,Lincoln Road,7
+Tue,The Warehouse,Lunn Avenue,7
+Tue,The Warehouse,Manukau,6
+Tue,The Warehouse,Milford,8
+Tue,The Warehouse,Mt Roskill,7
+Tue,The Warehouse,New Lynn,6
+Tue,The Warehouse,Newmarket,7
+Tue,The Warehouse,Pakuranga,6
+Tue,The Warehouse,Royal Oak,8
+Tue,The Warehouse,St Lukes,7
+Tue,The Warehouse,Sylvia Park,7
+Tue,The Warehouse,Takanini,6
+Tue,The Warehouse,WestCity,7
+Tue,The Warehouse,Westgate,6
+Wed,Noel Leeming,Albany,4
+Wed,Noel Leeming,Botany,5
+Wed,Noel Leeming,Glenfield Clearance,4
+Wed,Noel Leeming,Henderson,6
+Wed,Noel Leeming,Lunn Avenue,4
+Wed,Noel Leeming,Manukau Supa Centre,4
+Wed,Noel Leeming,Manukau Westfield,3
+Wed,Noel Leeming,Massey,4
+Wed,Noel Leeming,New Lynn,4
+Wed,Noel Leeming,Newmarket,6
+Wed,Noel Leeming,Ormiston,5
+Wed,Noel Leeming,Papakura,5
+Wed,Noel Leeming,Papatoetoe,5
+Wed,Noel Leeming,Penrose Clearance,4
+Wed,Noel Leeming,Queen Street,4
+Wed,Noel Leeming,Royal Oak,4
+Wed,Noel Leeming,St Lukes Mega,5
+Wed,Noel Leeming,St Lukes Westfield,5
+Wed,Noel Leeming,Sylvia Park,4
+Wed,Noel Leeming,Wairau Park,6
+Wed,The Warehouse,Airport,8
+Wed,The Warehouse,Albany,8
+Wed,The Warehouse,Atrium,6
+Wed,The Warehouse,Botany Downs,7
+Wed,The Warehouse,Clendon,7
+Wed,The Warehouse,Glenfield Mall,7
+Wed,The Warehouse,Lincoln Road,8
+Wed,The Warehouse,Lunn Avenue,6
+Wed,The Warehouse,Manukau,6
+Wed,The Warehouse,Milford,6
+Wed,The Warehouse,Mt Roskill,5
+Wed,The Warehouse,New Lynn,6
+Wed,The Warehouse,Newmarket,7
+Wed,The Warehouse,Pakuranga,8
+Wed,The Warehouse,Royal Oak,5
+Wed,The Warehouse,St Lukes,8
+Wed,The Warehouse,Sylvia Park,5
+Wed,The Warehouse,Takanini,6
+Wed,The Warehouse,WestCity,7
+Wed,The Warehouse,Westgate,9
+Thu,Noel Leeming,Albany,5
+Thu,Noel Leeming,Botany,5
+Thu,Noel Leeming,Glenfield Clearance,4
+Thu,Noel Leeming,Henderson,5
+Thu,Noel Leeming,Lunn Avenue,5
+Thu,Noel Leeming,Manukau Supa Centre,4
+Thu,Noel Leeming,Manukau Westfield,6
+Thu,Noel Leeming,Massey,6
+Thu,Noel Leeming,New Lynn,3
+Thu,Noel Leeming,Newmarket,5
+Thu,Noel Leeming,Ormiston,5
+Thu,Noel Leeming,Papakura,4
+Thu,Noel Leeming,Papatoetoe,5
+Thu,Noel Leeming,Penrose Clearance,6
+Thu,Noel Leeming,Queen Street,4
+Thu,Noel Leeming,Royal Oak,6
+Thu,Noel Leeming,St Lukes Mega,5
+Thu,Noel Leeming,St Lukes Westfield,5
+Thu,Noel Leeming,Sylvia Park,5
+Thu,Noel Leeming,Wairau Park,5
+Thu,The Warehouse,Airport,6
+Thu,The Warehouse,Albany,8
+Thu,The Warehouse,Atrium,6
+Thu,The Warehouse,Botany Downs,6
+Thu,The Warehouse,Clendon,7
+Thu,The Warehouse,Glenfield Mall,6
+Thu,The Warehouse,Lincoln Road,7
+Thu,The Warehouse,Lunn Avenue,7
+Thu,The Warehouse,Manukau,8
+Thu,The Warehouse,Milford,7
+Thu,The Warehouse,Mt Roskill,6
+Thu,The Warehouse,New Lynn,6
+Thu,The Warehouse,Newmarket,6
+Thu,The Warehouse,Pakuranga,8
+Thu,The Warehouse,Royal Oak,7
+Thu,The Warehouse,St Lukes,7
+Thu,The Warehouse,Sylvia Park,7
+Thu,The Warehouse,Takanini,6
+Thu,The Warehouse,WestCity,6
+Thu,The Warehouse,Westgate,6
+Fri,Noel Leeming,Albany,4
+Fri,Noel Leeming,Botany,7
+Fri,Noel Leeming,Glenfield Clearance,5
+Fri,Noel Leeming,Henderson,6
+Fri,Noel Leeming,Lunn Avenue,4
+Fri,Noel Leeming,Manukau Supa Centre,4
+Fri,Noel Leeming,Manukau Westfield,5
+Fri,Noel Leeming,Massey,5
+Fri,Noel Leeming,New Lynn,6
+Fri,Noel Leeming,Newmarket,5
+Fri,Noel Leeming,Ormiston,4
+Fri,Noel Leeming,Papakura,5
+Fri,Noel Leeming,Papatoetoe,5
+Fri,Noel Leeming,Penrose Clearance,5
+Fri,Noel Leeming,Queen Street,4
+Fri,Noel Leeming,Royal Oak,4
+Fri,Noel Leeming,St Lukes Mega,4
+Fri,Noel Leeming,St Lukes Westfield,5
+Fri,Noel Leeming,Sylvia Park,4
+Fri,Noel Leeming,Wairau Park,4
+Fri,The Warehouse,Airport,7
+Fri,The Warehouse,Albany,8
+Fri,The Warehouse,Atrium,7
+Fri,The Warehouse,Botany Downs,7
+Fri,The Warehouse,Clendon,8
+Fri,The Warehouse,Glenfield Mall,7
+Fri,The Warehouse,Lincoln Road,8
+Fri,The Warehouse,Lunn Avenue,7
+Fri,The Warehouse,Manukau,6
+Fri,The Warehouse,Milford,7
+Fri,The Warehouse,Mt Roskill,7
+Fri,The Warehouse,New Lynn,8
+Fri,The Warehouse,Newmarket,5
+Fri,The Warehouse,Pakuranga,7
+Fri,The Warehouse,Royal Oak,8
+Fri,The Warehouse,St Lukes,6
+Fri,The Warehouse,Sylvia Park,7
+Fri,The Warehouse,Takanini,7
+Fri,The Warehouse,WestCity,8
+Fri,The Warehouse,Westgate,6
+Sat,The Warehouse,Airport,3
+Sat,The Warehouse,Albany,4
+Sat,The Warehouse,Atrium,3
+Sat,The Warehouse,Botany Downs,3
+Sat,The Warehouse,Clendon,3
+Sat,The Warehouse,Glenfield Mall,3
+Sat,The Warehouse,Lincoln Road,3
+Sat,The Warehouse,Lunn Avenue,2
+Sat,The Warehouse,Manukau,4
+Sat,The Warehouse,Milford,3
+Sat,The Warehouse,Mt Roskill,3
+Sat,The Warehouse,New Lynn,2
+Sat,The Warehouse,Newmarket,4
+Sat,The Warehouse,Pakuranga,2
+Sat,The Warehouse,Royal Oak,4
+Sat,The Warehouse,St Lukes,2
+Sat,The Warehouse,Sylvia Park,3
+Sat,The Warehouse,Takanini,3
+Sat,The Warehouse,WestCity,4
+Sat,The Warehouse,Westgate,2

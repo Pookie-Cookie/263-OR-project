@@ -7,7 +7,10 @@ if __name__ == "__main__":
     #Load in data for warehouse locations and durations
     Locations = pd.read_csv('WarehouseLocations.csv')
     Durations = pd.read_csv('WarehouseDurations.csv')
-    Demands = pd.read_csv('dmnd_avgs.csv')
+    Demands = pd.read_csv('dmnd_avgs (1).csv')
+
+    #Generate demand estimates for each node 
+    demand_data = generate_demand_estimate(Locations,Demands)
 
     #create pd.Series for store names so we can access index of stores from store name inputs
     store_index=[]
@@ -21,9 +24,6 @@ if __name__ == "__main__":
     North_part_main, South_part_main = partition(Locations)
     Partitions = North_part_main.copy()
     Partitions.extend(South_part_main)
-
-    #Generate demand estimates for each node 
-    demand_data = generate_demand_estimate(Locations,Demands)
 
     #Generate List of routes for partitions
     no_generations = 2 #Change if we need more
@@ -106,22 +106,23 @@ if __name__ == "__main__":
     Pattern_costs = {Pattern_names[i]:Pattern_costs[i] for i in range(len(Pattern_names))}
 
     #Create binary problem variables
-    Vars = LpVariable.dicts("Pattern", Pattern_names, 0, 1, LpInteger)
+    vars = LpVariable.dicts("Pattern", Pattern_names, 0, 1, LpInteger)
+
 
     #Create problem variable
     prob = LpProblem('The truck routing problem',LpMinimize)
 
     #Objective function: minimising chosen routes x cost of each chosen route
-    prob += lpSum(Vars[i] * Pattern_costs[i] for i in Pattern_names), "routing cost"
+    prob += lpSum(vars[i] * Pattern_costs[i] for i in Pattern_names), "routing cost"
 
     #demand minimum constraint
     for node in Node_names:
         #Selected route must pass through all nodes
-        prob += lpSum([Vars[j]*Patterns[node][j] for j in Pattern_names]) >= 1, "Satisfying demand for " + node
+        prob += lpSum([vars[j] * Patterns[j][node] for j in Pattern_names]) == 1, "Satisfying demand for " + node
 
     
     prob.writeLP("TruckRoutingProblem.lp")
-    '''
+    
     prob.solve()
     
     print("Status:", LpStatus[prob.status])
@@ -130,7 +131,7 @@ if __name__ == "__main__":
         print(v.name, "=", v.varValue)
 
     print("Routing Costs = ", value(prob.objective))
-    '''
+    
 
     
 
