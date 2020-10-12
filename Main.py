@@ -1,6 +1,7 @@
 from functions import *
 from copy import deepcopy
 from pulp import *
+import math
 
 if __name__ == "__main__":
 
@@ -89,10 +90,10 @@ if __name__ == "__main__":
         costs = 0
         #calculate the costs of the routes
         if route[1] > 14400:
-            costs = 174*4
-            costs += (route[1]-14400)%3600*250
+            costs = 175*4
+            costs += math.ceil((route[1]-14400)/3600)*250
         else:
-            costs = route[1]%3600*175
+            costs = math.ceil(route[1]/3600)*175
 
         Pattern_costs.append(costs)
 

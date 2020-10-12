@@ -54,6 +54,8 @@ def partition(Locations):
     
     return North,South
 
+
+
 def duration_calc(route,duration,route_index):
     """
     This function calculate the duration of a particular route, including the trip back to the starting point and unloading time
