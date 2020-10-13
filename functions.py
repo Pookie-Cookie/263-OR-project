@@ -179,6 +179,9 @@ dataframe containing the travel time between two stores
 
 demand_data: dictionary
 dictionary matching the store name to the estimated demand for the store
+
+route_index: array like
+a pd.Series array giving corresponding index values for store names
 ------
 Outputs
 
@@ -267,7 +270,22 @@ def generate_demand_estimate(Locations,demand):
     return demand_estimate
 
 def partition_alt(Locations):
-    #Script that outputs lists of stores names after partitions are made across distribution centres
+    """
+    Function that outputs a list of lists of stores names in partitions, made across geographical locations
+    ------
+    Inputs:
+
+    locations: array-like
+    dataframe containing the longitude and latitude values for the stores
+    ------
+    Outputs:
+
+    partition: Set
+    Set of store location names in the partition
+
+    stores: Set
+    Set of all store location names
+    """
 
     #records long and lat values of nodes
     coords = Locations[['Long', 'Lat']]
@@ -327,6 +345,9 @@ Inputs
 partition: Set
 Set of store location names in the partition
 
+stores: Set
+Set of all store location names
+
 locations: array-like
 dataframe containing the longitude and latitude values for the stores
 
@@ -338,23 +359,14 @@ dataframe containing the travel time between two stores
 
 demand_data: dictionary
 dictionary matching the store name to the estimated demand for the store
+
+route_index: array like
+a pd.Series array giving corresponding index values for store names
 ------
 Outputs
 
 routes: array-like
 List of routes generated from the partition. (Routes are a list of nodes in order of travel)
-------
-Pesudocode for route generation
-
-Create set of visited & unvisited
-       While there are still unvisited nodes in the partition:
-           Create a route with starting node at distribution centre:
-           While total demand in route <20:
-               Select random node in partition
-               If adding node's demand does not exceed toal demand of 20:
-                   add node into route & add its estimated demand to route
-                   move added node from unvisited to visited in partition
-           Save route to list of routes
 ------
     '''
     #Insert client key to OperRouteService
@@ -399,9 +411,29 @@ Create set of visited & unvisited
 
 def demand_calc(route,demand_data):
 
+    """
+    This function generates a set of feasible routes for a partition of stores(nodes)
+    ------
+    Inputs
+
+    route: Set
+    Set of store location names visited in the route
+
+    demand_data: dictionary
+    dictionary matching the store name to the estimated demand for the store
+
+    ------
+    Outputs
+
+    demand: int
+    Number of pallets required to fulfill the input route
+    """
+    #sets base demand to 0
     demand = 0
     for store in route:
+        #iterates over all non distribution nodes in route
         if (store != 'Distribution North') & store != 'Distribution South':
+            #sums demands
             demand += demand_data[store]
     
     return demand

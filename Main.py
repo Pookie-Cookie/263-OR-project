@@ -62,26 +62,34 @@ if __name__ == "__main__":
                     if (partitions[i%6] != []) & (count < 50):
                         #Randomise selection of node in partition before generating route
                         random.shuffle(partitions[i%6])
+                        #generates route for both distribution scenario
                         if k == 0:
                             route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                        #generates route for northern distibution closure scenario
                         else:
                             route = route_gen_single(Locations,distribution[1],partitions[i%6],stores,Durations,demand_data,route_index)
+                        #adds route to partition routes and increases count
                         routes[i%6].append(route)
                         count += 1
                     #Arrangement when all shifts are factored in: attempt to fit stores in existing shifts using additional hours at $250/hr
                     elif (partitions[i%6] != []) & (count == 50):
                         for store in partitions:
                             for route in routes[i%6]:
+                                #for each unvisited stores in partitions, attempts to add store to existing route
                                 route.append(store)
 
+                                #tests for demand and duration
                                 route_duration = cheapest_insertion(route,Durations,demand_data,route_index)
                                 demand=demand_calc(route,demand_data)
                                 if (demand <= 20) & (route_duration[1] <= 21600):
+                                    #if demand and duration are satisfied, removes store from unvisited sets
                                     stores.remove(store)
                                     partitions[i%6].remove(store)
                                     break
                                 else:
+                                    #else removes store from route
                                     route.remove(store)
+                        #if routes fail to include additional nodes, adds additional routes as per normal
                         if partitions[i%6] != []:
                             random.shuffle(partitions[i%6])
                             if k == 0:
