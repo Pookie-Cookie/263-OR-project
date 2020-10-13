@@ -158,8 +158,12 @@ if __name__ == "__main__":
         else:
             prob = LpProblem('The truck routing problem (closed north centre)',LpMinimize)
         #Objective function: minimising chosen routes x cost of each chosen route
-        prob += lpSum(vars[j] * Pattern_costs[j] for j in Pattern_names) + wet_leases*1500 + extra_trucks*20000/30, "routing cost"
 
+        if i == 0:
+            prob += lpSum(vars[j] * Pattern_costs[j] for j in Pattern_names) + wet_leases*1500 + extra_trucks*20000/30, "routing cost"
+        else:
+            #Converting the $400000 saved by closing the northern distribution centre into savings per day
+            prob += lpSum(vars[j] * Pattern_costs[j] for j in Pattern_names) + wet_leases*1500 + extra_trucks*20000/30 - 400000/30, "routing cost"
         #demand minimum constraint
         for node in Node_names:
             #Selected route must pass through all nodes
@@ -183,7 +187,8 @@ if __name__ == "__main__":
         for v in prob.variables():
             if v.varValue == 1:
                 count = count + 1
-                print(v.name, "=", Pattern_costs[v.name[8:]])
+                #print(v.name, "=", Pattern_costs[v.name[8:]])
+                print(feasible_routes[i][int(v.name[8:])][0])
         print("Total no. truck shifts = ", count)
         print("Total routing Costs = ", value(prob.objective))
     
