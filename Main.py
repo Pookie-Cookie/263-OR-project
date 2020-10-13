@@ -22,7 +22,7 @@ if __name__ == "__main__":
     route_index = pd.Series(data=store_index, index = Locations['Store'])
 
     #Generate List of routes for partitions
-    no_generations = 2 #Change if we need more
+    no_generations = 100 #Change if we need more
 
     
     #Partition nodes into north & south groups with 3 subgroups in each
@@ -33,97 +33,69 @@ if __name__ == "__main__":
     #Create route storage for linear progam with both distribution centres
     feasible_routes = [[],[]] #[0] = both centres [1] = closed north centre
 
-
-    for i in range(no_generations): 
-        #Deepcopy by value as parition nodes are popped during each cycle
-        North_part = deepcopy(North_part_main)
-        South_part = deepcopy(South_part_main)
-
-        for part in North_part:
-            #Create route from path & add to total set 
-            routes = route_gen(Locations,'Distribution North',part,Durations,demand_data,route_index)
-            for route in routes:
-                feasible_routes[0].append(route)
-     
-        for part in South_part:
-            #Create route from path & add to total set 
-            routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
-            for route in routes:
-                feasible_routes[0].append(route)
     
-
-    
-    #For scenario of closing Northen distribution centre
-    North_part, South_part = partition(Locations)
-    Partitions_main = North_part.copy()
-    Partitions_main.extend(South_part)
-    
-    for i in range(no_generations): 
-        Partitions = deepcopy(Partitions_main)
-        for part in Partitions:
-        #Create route from path & add to total set 
-            routes = route_gen(Locations,'Distribution South',part,Durations,demand_data,route_index)
-            for route in routes:
-                feasible_routes[1].append(route)
-    
-
-    '''
-    #ALTERNATIVE ROUTE GEN - attempts 50 routes < 4 hours before assigning additional stores to trucks then adds wet leased routes
+    #ROUTE GEN - attempts 50 routes < 4 hours before assigning additional stores to trucks then adds wet leased routes
     
     partitions_main,stores_main = partition_alt(Locations)
 
     distribution = ['Distribution North','Distribution South']
 
-    feasible_routes = []
+    for k in range(2):
+        for j in range(no_generations):
+            partitions=deepcopy(partitions_main) 
+            stores=deepcopy(stores_main) 
+            N1routes = []
+            S1routes = []
+            N2routes = []
+            S2routes = []
+            N3routes = []
+            S3routes = []
 
-    for j in range(no_generations):
-        partitions=deepcopy(partitions_main) 
-        stores=deepcopy(stores_main) 
-        N1routes = []
-        S1routes = []
-        N2routes = []
-        S2routes = []
-        N3routes = []
-        S3routes = []
+            routes = [N1routes,S1routes,N2routes,S2routes,N3routes,S3routes]
 
-        routes = [N1routes,S1routes,N2routes,S2routes,N3routes,S3routes]
+            count = 0
 
-        count = 0
-
-        #Loop until no store remains unvisited
-        while stores != []:
-            for i in range(200):
-                #Arrangement for all shifts of our avalible 25 trucks: add route to each shift at $175/hr
-                if (partitions[i%6] != []) & (count < 50):
-                    #Randomise selection of node in partition before generating route
-                    random.shuffle(partitions[i%6])
-                    route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
-                    routes[i%6].append(route)
-                    count += 1
-                #Arrangement when all shifts are factored in: attempt to fit stores in existing shifts using additional hours at $250/hr
-                elif (partitions[i%6] != []) & (count == 50):
-                    for store in partitions:
-                        for route in routes[i%6]:
-                            route.append(store)
-
-                            route_duration = cheapest_insertion(route,Durations,demand_data,route_index)
-                            demand=demand_calc(route,demand_data)
-                            if (demand <= 20) & (route_duration[1] <= 21600):
-                                stores.remove(store)
-                                partitions[i%6].remove(store)
-                                break
-                            else:
-                                route.remove(store)
-                    if partitions[i%6] != []:
+            #Loop until no store remains unvisited
+            while stores != []:
+                for i in range(200):
+                    #Arrangement for all shifts of our avalible 25 trucks: add route to each shift at $175/hr
+                    if (partitions[i%6] != []) & (count < 50):
+                        #Randomise selection of node in partition before generating route
                         random.shuffle(partitions[i%6])
-                        route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                        if k == 0:
+                            route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                        else:
+                            route = route_gen_single(Locations,distribution[1],partitions[i%6],stores,Durations,demand_data,route_index)
                         routes[i%6].append(route)
+                        count += 1
+                    #Arrangement when all shifts are factored in: attempt to fit stores in existing shifts using additional hours at $250/hr
+                    elif (partitions[i%6] != []) & (count == 50):
+                        for store in partitions:
+                            for route in routes[i%6]:
+                                route.append(store)
 
-        #Collect all routes into list
-        for partition in routes:
-            for route in partition:
-                feasible_routes.append(route)
-    '''
+                                route_duration = cheapest_insertion(route,Durations,demand_data,route_index)
+                                demand=demand_calc(route,demand_data)
+                                if (demand <= 20) & (route_duration[1] <= 21600):
+                                    stores.remove(store)
+                                    partitions[i%6].remove(store)
+                                    break
+                                else:
+                                    route.remove(store)
+                        if partitions[i%6] != []:
+                            random.shuffle(partitions[i%6])
+                            if k == 0:
+                                route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                            else:
+                                route = route_gen_single(Locations,distribution[1],partitions[i%6],stores,Durations,demand_data,route_index)
+                            
+                            routes[i%6].append(route)
+
+            #Collect all routes into list
+            for partition in routes:
+                for route in partition:
+                    feasible_routes[k].append(route)
+    
 
     #LP formulation
 
