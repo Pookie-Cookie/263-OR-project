@@ -102,6 +102,7 @@ if __name__ == "__main__":
             #Collect all routes into list
             for partition in routes:
                 for route in partition:
+                    route[0].insert(len(route[0]),route[0][0])
                     feasible_routes[k].append(route)
     
 
