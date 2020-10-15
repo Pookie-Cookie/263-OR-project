@@ -3,6 +3,7 @@ from copy import deepcopy
 from pulp import *
 import math
 
+
 if __name__ == "__main__":
 
     #Load in data for warehouse locations and durations
@@ -182,13 +183,19 @@ if __name__ == "__main__":
     
         #print("Status:", LpStatus[prob.status])
     
+        #Saving results to csv file
+        f = open('routes.txt' + str(i),'w')
+
         print("Selected route / cost in $")
         count = 0
         for v in prob.variables():
             if v.varValue == 1:
                 count = count + 1
-                #print(v.name, "=", Pattern_costs[v.name[8:]])
-                print(feasible_routes[i][int(v.name[8:])][0])
+
+                print(v.name, "=", Pattern_costs[v.name[8:]])
+                route = feasible_routes[i][int(v.name[8:])][0]
+                f.write(','.join(route))
+                f.write('\n')
         print("Total no. truck shifts = ", count)
         print("Total routing Costs = ", value(prob.objective))
     
