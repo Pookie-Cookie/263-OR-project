@@ -193,7 +193,14 @@ if __name__ == "__main__":
         #print("Status:", LpStatus[prob.status])
     
         #Saving results to csv file
-        f = open('routes.txt' + str(i),'w')
+        if i == 0:
+            # Northern and southern distribution
+            f = open('routes_statusquo.csv','w')
+        else:
+            # Southern only
+            f = open('routes_closure.csv','w')
+
+        
 
         print("Selected route / cost in $")
         count = 0
@@ -207,7 +214,8 @@ if __name__ == "__main__":
                 f.write('\n')
         print("Total no. truck shifts = ", count)
         print("Total routing Costs = ", value(prob.objective))
-    
+        
+        f.close()
 
     
 
