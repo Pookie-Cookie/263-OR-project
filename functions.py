@@ -3,6 +3,7 @@ import numpy as np
 #import openrouteservice as ors
 #import folium
 import random
+from copy import deepcopy
 
 def partition(Locations):
     #Script that outputs lists of stores names after partitions are made across distribution centres
@@ -336,7 +337,7 @@ def partition_alt(Locations):
     
     return partitions,stores
 
-def route_gen_single(locations,distribution_location,partition,stores,durations,demand_data,route_index):
+def route_gen_single(distribution_location,partition,stores,durations,demand_data,route_index):
     '''
 This function generates a set of feasible routes for a partition of stores(nodes)
 ------
@@ -432,8 +433,37 @@ def demand_calc(route,demand_data):
     demand = 0
     for store in route:
         #iterates over all non distribution nodes in route
-        if (store != 'Distribution North') & store != 'Distribution South':
+        if (store != 'Distribution North') & (store != 'Distribution South'):
             #sums demands
             demand += demand_data[store]
     
     return demand
+
+
+def route_replicate(routes,distribution,durations,demand_data,route_index):
+
+    simulate_routes = []
+
+    for path in routes:
+        route = deepcopy(path)
+        route.pop()
+        simulate_route = []
+        route = deepcopy(path)
+        
+        for store in path:
+            simulate_route.append(store)
+            demand = demand_calc(simulate_route,demand_data)
+            if demand >= 20:
+                simulate_route.remove(store)
+            else:
+                route.remove(store)
+        if len(simulate_route) != 1:
+            simulate_routes.append(simulate_route)
+
+        while route != []:
+            routeset=deepcopy(route)
+            single_route=route_gen_single(distribution,route,routeset,durations,demand_data,route_index)
+            simulate_routes.append(single_route[0])
+        
+
+    return simulate_routes

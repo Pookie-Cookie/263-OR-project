@@ -23,7 +23,7 @@ if __name__ == "__main__":
     route_index = pd.Series(data=store_index, index = Locations['Store'])
 
     #Generate List of routes for partitions
-    no_generations = 100 #Change if we need more
+    no_generations = 10 #Change if we need more
 
     
     #Partition nodes into north & south groups with 3 subgroups in each
@@ -65,10 +65,10 @@ if __name__ == "__main__":
                         random.shuffle(partitions[i%6])
                         #generates route for both distribution scenario
                         if k == 0:
-                            route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                            route = route_gen_single(distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
                         #generates route for northern distibution closure scenario
                         else:
-                            route = route_gen_single(Locations,distribution[1],partitions[i%6],stores,Durations,demand_data,route_index)
+                            route = route_gen_single(distribution[1],partitions[i%6],stores,Durations,demand_data,route_index)
                         #adds route to partition routes and increases count
                         routes[i%6].append(route)
                         count += 1
@@ -94,9 +94,9 @@ if __name__ == "__main__":
                         if partitions[i%6] != []:
                             random.shuffle(partitions[i%6])
                             if k == 0:
-                                route = route_gen_single(Locations,distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
+                                route = route_gen_single(distribution[i%2],partitions[i%6],stores,Durations,demand_data,route_index)
                             else:
-                                route = route_gen_single(Locations,distribution[1],partitions[i%6],stores,Durations,demand_data,route_index)
+                                route = route_gen_single(distribution[1],partitions[i%6],stores,Durations,demand_data,route_index)
                             
                             routes[i%6].append(route)
 
@@ -115,6 +115,8 @@ if __name__ == "__main__":
 
     #Get dictionary of node names to its respective demand  
     Node_demands = generate_demand_estimate(Locations, Demands)
+
+    chosenroute = []
 
     #Separate formulation for the two scenarios
     for i in range (len(feasible_routes)):
@@ -212,10 +214,20 @@ if __name__ == "__main__":
                 route = feasible_routes[i][int(v.name[8:])][0]
                 f.write(','.join(route))
                 f.write('\n')
+                if i == 1:
+                    chosenroute.append(feasible_routes[i][int(v.name[8:])][0])
         print("Total no. truck shifts = ", count)
         print("Total routing Costs = ", value(prob.objective))
         
         f.close()
 
+    Locations = pd.read_csv('WarehouseLocations.csv')
+    for store in Locations['Store']:
+        if (store != "Distribution North") & (store != "Distribution South"):
+            demand_data[store] += 2 #placeholder randomise
+
+    route_simulate=route_replicate(chosenroute,distribution[1],Durations,demand_data,route_index)
+
+    print(len(route_simulate))
     
 
