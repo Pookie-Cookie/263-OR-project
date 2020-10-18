@@ -410,7 +410,7 @@ List of routes generated from the partition. (Routes are a list of nodes in orde
 
     return route
 
-def demand_calc(route,demand_data):
+def demand_calc(route,demand_data,simulate = None):
 
     """
     This function generates a set of feasible routes for a partition of stores(nodes)
@@ -435,7 +435,13 @@ def demand_calc(route,demand_data):
         #iterates over all non distribution nodes in route
         if (store != 'Distribution North') & (store != 'Distribution South'):
             #sums demands
-            demand += demand_data[store]
+
+            #For simulation, use estimated store demand & std(rn set to 2)
+            if simulate:
+                simu_demand = round(np.random.normal(demand_data[store],2))
+                demand += simu_demand
+            else: 
+                demand += demand_data[store]
     
     return demand
 
@@ -452,7 +458,7 @@ def route_replicate(routes,distribution,durations,demand_data,route_index):
         
         for store in path:
             simulate_route.append(store)
-            demand = demand_calc(simulate_route,demand_data)
+            demand = demand_calc(simulate_route,demand_data,simulate = True)
             if demand >= 20:
                 simulate_route.remove(store)
             else:
