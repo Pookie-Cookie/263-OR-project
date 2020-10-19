@@ -221,10 +221,12 @@ if __name__ == "__main__":
         
         f.close()
 
+    """
     Locations = pd.read_csv('WarehouseLocations.csv')
     for store in Locations['Store']:
         if (store != "Distribution North") & (store != "Distribution South"):
             demand_data[store] += 2 #placeholder randomise
+    """
 
     route_simulate=route_replicate(chosenroute,distribution[1],Durations,demand_data,route_index)
 

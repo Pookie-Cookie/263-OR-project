@@ -449,6 +449,7 @@ def demand_calc(route,demand_data,simulate = None):
 def route_replicate(routes,distribution,durations,demand_data,route_index):
 
     simulate_routes = []
+    unvisited = []
 
     for path in routes:
         route = deepcopy(path)
@@ -466,10 +467,18 @@ def route_replicate(routes,distribution,durations,demand_data,route_index):
         if len(simulate_route) != 1:
             simulate_routes.append(simulate_route)
 
-        while route != []:
-            routeset=deepcopy(route)
-            single_route=route_gen_single(distribution,route,routeset,durations,demand_data,route_index)
-            simulate_routes.append(single_route[0])
+        if route != []:
+            for store in route:
+                if (store != 'Distribution North') & (store != 'Distribution South'):
+                    unvisited.append(store)
+                route.remove(store)
+
+    routeset=deepcopy(unvisited)
+
+    while unvisited != []:        
+        routeset=deepcopy(unvisited)
+        single_route=route_gen_single(distribution,unvisited,routeset,durations,demand_data,route_index)
+        simulate_routes.append(single_route[0])
         
 
     return simulate_routes
