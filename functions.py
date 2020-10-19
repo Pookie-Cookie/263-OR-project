@@ -57,7 +57,7 @@ def partition(Locations):
 
 
 
-def duration_calc(route,duration,route_index,demand_data):
+def duration_calc(route,duration,route_index,demand_data,scale=None,shift=None):
     """
     This function calculate the duration of a particular route, including the trip back to the starting point and unloading time
 
@@ -87,6 +87,16 @@ def duration_calc(route,duration,route_index,demand_data):
     total_duration += duration[route[-1]][route_index[route[0]]]
     #accounts for unloading at store
     
+    #Adds scaling factor for shift
+    if scale == True:
+        hours = total_duration/3600
+        if shift == True:
+            #For routes starting at 8am, we will experience a 25% increase in traffic at 8am and a 25% decrease at 2pm, points between vary linearly
+            total_duration = total_duration * (1+(0.25*hours - hours**2/24))
+        if shift == False:
+            #For routes starting at 2am, we will experience a 25% decrease in traffic at 2pm and a 25% increase at 8pm, points between vary linearly
+            total_duration = total_duration * (1+(hours**2/24 - 0.25*hours))
+
     return total_duration
     
 
@@ -448,37 +458,65 @@ def demand_calc(route,demand_data,simulate = None):
 
 def route_replicate(routes,distribution,durations,demand_data,route_index):
 
+    #creates empty sets for routes and unvisited stores
     simulate_routes = []
     unvisited = []
 
+    #iterates over our initially planed routes
     for path in routes:
+        #creates copy to manipulate
         route = deepcopy(path)
-        route.pop()
+
+        #creates empty set for current route
         simulate_route = []
-        route = deepcopy(path)
         
         for store in path:
+            #adds store to replica path
             simulate_route.append(store)
-            demand = demand_calc(simulate_route,demand_data,simulate = True)
-            if demand >= 20:
+
+            #tests for demand and duration
+            demand = demand_calc(simulate_route,demand_data,simulate = False)
+            if store != distribution:
+                duration = duration_calc(simulate_route,durations,route_index,demand_data,scale=False,shift=False)
+            if store == distribution:
+                duration = 0
+
+            if (demand > 20) | (duration > 14400):
+                #if demand or duration exceeds normal levels, removes store from path
                 simulate_route.remove(store)
             else:
+                #else removes from route
                 route.remove(store)
+
         if len(simulate_route) != 1:
+            #appends route
             simulate_routes.append(simulate_route)
 
         if route != []:
+            #while there are unvisited stores in route, adds stores to unvisited set
             for store in route:
                 if (store != 'Distribution North') & (store != 'Distribution South'):
                     unvisited.append(store)
                 route.remove(store)
 
-    routeset=deepcopy(unvisited)
-
-    while unvisited != []:        
+    while unvisited != []:  
+        #creates copy of unvisited to manipulate      
         routeset=deepcopy(unvisited)
+        #gens single route from list of unvisited
         single_route=route_gen_single(distribution,unvisited,routeset,durations,demand_data,route_index)
+        single_route[0].insert(len(single_route[0]),distribution)
+        #appends route
         simulate_routes.append(single_route[0])
-        
+    
+    #initialise duration 
+    route_duration = np.zeros(len(simulate_routes))
 
-    return simulate_routes
+    for i in range(len(simulate_routes)):
+        if i < 25:
+            #calcs duration for 8am shift
+            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=True,shift=True)
+        else:
+            #calcs duration for 2pm shift
+            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=True,shift=False)
+
+    return simulate_routes, route_duration
