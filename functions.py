@@ -515,10 +515,10 @@ def route_replicate(routes,distribution,durations,demand_data,route_index):
     for i in range(len(simulate_routes)):
         if i < 25:
             #calcs duration for 8am shift
-            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=True,shift=True)
+            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=False,shift=True)
         else:
             #calcs duration for 2pm shift
-            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=True,shift=False)
+            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=False,shift=False)
 
     return simulate_routes, route_duration
 

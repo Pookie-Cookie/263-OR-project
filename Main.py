@@ -1,6 +1,8 @@
 from functions import *
 from copy import deepcopy
 from pulp import *
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
 
 
 
@@ -216,22 +218,36 @@ if __name__ == "__main__":
         
         f.close()
 
-    
+    demand_random = deepcopy(demand_data)
     Locations = pd.read_csv('WarehouseLocations.csv')
-    for store in Locations['Store']:
-        if (store != "Distribution North") & (store != "Distribution South"):
-            #simulates random demand prior to function call
-            demand_data[store] = round(np.random.normal(demand_data[store],2))
+    
     
     total_cost_simulated = []
     #attempts to replicate chosen routes and ammends shortcomings with extra routes
-    for i in range(100):
-        route_simulate,route_durations=route_replicate(chosenroute,distribution[1],Durations,demand_data,route_index)
+    for i in range(500):
+        for store in Locations['Store']:
+            if (store != "Distribution North") & (store != "Distribution South"):
+                #simulates random demand prior to function call
+                demand_random[store] = round(np.random.normal(demand_data[store],2))
+        route_simulate,route_durations=route_replicate(chosenroute,distribution[1],Durations,demand_random,route_index)
         route_costs = []
         for j in range(len(route_durations)):
             route_costs.append(calculate_cost(route_durations[j])) 
         total_cost_simulated.append(sum(route_costs))
 
+    cost_sort = deepcopy(total_cost_simulated)
+    cost_sort.sort()
+
+    density = gaussian_kde(total_cost_simulated)
+    xs = np.linspace(10000,15000,200)
+    density.covariance_factor = lambda : .1
+    density._compute_covariance()
+    plt.plot(xs,density(xs))
+
+    plt.axvline(x = cost_sort[12], color = 'k')
+    plt.axvline(x = cost_sort[487], color = 'k')
+
+    plt.show()
     print(len(route_simulate))
     
 
