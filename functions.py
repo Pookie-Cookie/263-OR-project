@@ -4,6 +4,7 @@ import numpy as np
 #import folium
 import random
 from copy import deepcopy
+import math
 
 def partition(Locations):
     #Script that outputs lists of stores names after partitions are made across distribution centres
@@ -520,3 +521,12 @@ def route_replicate(routes,distribution,durations,demand_data,route_index):
             route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=True,shift=False)
 
     return simulate_routes, route_duration
+
+def calculate_cost(duration):
+    if duration > 14400:
+        costs = 175*4
+        costs += math.ceil((duration-14400)/3600)*250
+    else:
+        costs = math.ceil(duration/3600)*175
+
+    return costs

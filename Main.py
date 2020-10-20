@@ -1,7 +1,7 @@
 from functions import *
 from copy import deepcopy
 from pulp import *
-import math
+
 
 
 if __name__ == "__main__":
@@ -132,13 +132,8 @@ if __name__ == "__main__":
         #Separate the routes & respective costs from the feasible_route data format
         for route in feasible_routes[i]:   
             Patterns.append(route[0])
-            costs = 0
+            costs = calculate_cost(route[1])
             #calculate the costs of the routes
-            if route[1] > 14400:
-                costs = 175*4
-                costs += math.ceil((route[1]-14400)/3600)*250
-            else:
-                costs = math.ceil(route[1]/3600)*175
 
             Pattern_costs.append(costs)
 
@@ -230,6 +225,10 @@ if __name__ == "__main__":
     
     #attempts to replicate chosen routes and ammends shortcomings with extra routes
     route_simulate,route_durations=route_replicate(chosenroute,distribution[1],Durations,demand_data,route_index)
+
+    route_costs = []
+    for i in range(len(route_durations)):
+        route_costs.append(calculate_cost(route_durations[i])) 
 
     print(len(route_simulate))
     
