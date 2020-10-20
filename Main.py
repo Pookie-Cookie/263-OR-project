@@ -223,12 +223,14 @@ if __name__ == "__main__":
             #simulates random demand prior to function call
             demand_data[store] = round(np.random.normal(demand_data[store],2))
     
+    total_cost_simulated = []
     #attempts to replicate chosen routes and ammends shortcomings with extra routes
-    route_simulate,route_durations=route_replicate(chosenroute,distribution[1],Durations,demand_data,route_index)
-
-    route_costs = []
-    for i in range(len(route_durations)):
-        route_costs.append(calculate_cost(route_durations[i])) 
+    for i in range(100):
+        route_simulate,route_durations=route_replicate(chosenroute,distribution[1],Durations,demand_data,route_index)
+        route_costs = []
+        for j in range(len(route_durations)):
+            route_costs.append(calculate_cost(route_durations[j])) 
+        total_cost_simulated.append(sum(route_costs))
 
     print(len(route_simulate))
     
