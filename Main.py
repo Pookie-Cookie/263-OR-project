@@ -255,7 +255,7 @@ if __name__ == "__main__":
 
         plt.axvline(x = cost_sort[round(sim_size*0.025)], color = 'k', label = ("Confidence Interval = [" + '{:.2f}'.format(cost_sort[round(sim_size*0.025)]) + " , " + '{:.2f}'.format(cost_sort[round(sim_size*0.975)]) + "]"))
         plt.axvline(x = cost_sort[round(sim_size*0.975)], color = 'k')
-        plt.axvline(x = cost_sort[round(sim_size*0.5)], color = 'g', label = "Expected cost (with simulation) = $" + '{:.2f}'.format(cost_sort[round(sim_size*0.5)]))
+        plt.axvline(x = cost_sort[round(sim_size*0.5)], color = 'g', label = "Median cost (with simulation) = $" + '{:.2f}'.format(cost_sort[round(sim_size*0.5)]))
         plt.axvline(x = total_cost[x], color = 'r', label = ("Optimal Cost (without simulation) = $" + '{:.2f}'.format(total_cost[x])))
 
         if x == 1:
