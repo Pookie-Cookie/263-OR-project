@@ -118,7 +118,8 @@ if __name__ == "__main__":
     #Get dictionary of node names to its respective demand  
     Node_demands = generate_demand_estimate(Locations, Demands)
 
-    chosenroute = []
+    chosenroute = [[],[]]
+    total_cost = []
 
     #Separate formulation for the two scenarios
     for i in range (len(feasible_routes)):
@@ -211,11 +212,12 @@ if __name__ == "__main__":
                 route = feasible_routes[i][int(v.name[8:])][0]
                 f.write(','.join(route))
                 f.write('\n')
-                if i == 1:
-                    chosenroute.append(feasible_routes[i][int(v.name[8:])][0])
+                
+                chosenroute[i].append(feasible_routes[i][int(v.name[8:])][0])
         print("Total no. truck shifts = ", count)
         print("Total routing Costs = ", value(prob.objective))
-        
+        total_cost.append(value(prob.objective))
+
         f.close()
 
     demand_random = deepcopy(demand_data)
@@ -223,31 +225,34 @@ if __name__ == "__main__":
     
     
     total_cost_simulated = []
-    #attempts to replicate chosen routes and ammends shortcomings with extra routes
-    for i in range(500):
-        for store in Locations['Store']:
-            if (store != "Distribution North") & (store != "Distribution South"):
-                #simulates random demand prior to function call
-                demand_random[store] = round(np.random.normal(demand_data[store],2))
-        route_simulate,route_durations=route_replicate(chosenroute,distribution[1],Durations,demand_random,route_index)
-        route_costs = []
-        for j in range(len(route_durations)):
-            route_costs.append(calculate_cost(route_durations[j])) 
-        total_cost_simulated.append(sum(route_costs))
 
-    cost_sort = deepcopy(total_cost_simulated)
-    cost_sort.sort()
+    for x in range (2):
+        #attempts to replicate chosen routes and ammends shortcomings with extra routes
+        for i in range(500):
+            for store in Locations['Store']:
+                if (store != "Distribution North") & (store != "Distribution South"):
+                    #simulates random demand prior to function call
+                    demand_random[store] = round(np.random.normal(demand_data[store],2))
+            route_simulate,route_durations=route_replicate(chosenroute[x],distribution[x],Durations,demand_random,route_index)
+            route_costs = []
+            for j in range(len(route_durations)):
+                route_costs.append(calculate_cost(route_durations[j])) 
+            total_cost_simulated.append(sum(route_costs))
 
-    density = gaussian_kde(total_cost_simulated)
-    xs = np.linspace(cost_sort[0],cost_sort[-1],200)
-    density.covariance_factor = lambda : .2
-    density._compute_covariance()
-    plt.plot(xs,density(xs))
+        cost_sort = deepcopy(total_cost_simulated)
+        cost_sort.sort()
 
-    plt.axvline(x = cost_sort[12], color = 'k')
-    plt.axvline(x = cost_sort[487], color = 'k')
+        density = gaussian_kde(total_cost_simulated)
+        xs = np.linspace(cost_sort[0],cost_sort[-1],200)
+        density.covariance_factor = lambda : .2
+        density._compute_covariance()
+        plt.plot(xs,density(xs))
 
-    plt.show()
-    print(len(route_simulate))
+        plt.axvline(x = cost_sort[12], color = 'k')
+        plt.axvline(x = cost_sort[487], color = 'k')
+
+        plt.axvline(x = total_cost[x], color = 'r')
+        plt.show()
+        print(len(route_simulate))
     
 
