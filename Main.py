@@ -224,20 +224,24 @@ if __name__ == "__main__":
     Locations = pd.read_csv('WarehouseLocations.csv')
     
     
-    total_cost_simulated = []
+    
 
     for x in range (2):
+        total_cost_simulated = []
         #attempts to replicate chosen routes and ammends shortcomings with extra routes
         for i in range(500):
             for store in Locations['Store']:
                 if (store != "Distribution North") & (store != "Distribution South"):
                     #simulates random demand prior to function call
-                    demand_random[store] = round(np.random.normal(demand_data[store],2))
+                    demand_random[store] = min(round(np.random.normal(demand_data[store],2)),20)
             route_simulate,route_durations=route_replicate(chosenroute[x],distribution[x],Durations,demand_random,route_index)
             route_costs = []
             for j in range(len(route_durations)):
-                route_costs.append(calculate_cost(route_durations[j])) 
-            total_cost_simulated.append(sum(route_costs))
+                route_costs.append(calculate_cost(route_durations[j]))
+            if x == 1:
+                 total_cost_simulated.append(sum(route_costs) - 400000/30)
+            else:
+                total_cost_simulated.append(sum(route_costs))
 
         cost_sort = deepcopy(total_cost_simulated)
         cost_sort.sort()

@@ -411,6 +411,9 @@ List of routes generated from the partition. (Routes are a list of nodes in orde
             stores.remove(node)
             #Reset popped node counter
             count = 0
+        elif (len(route) == 2) & (len(partition) == 0):
+            stores.remove(node)
+            break
         else:
             #Adding node back to set of unvisited as adding causes excess demand
             route.remove(node)
@@ -481,9 +484,9 @@ def route_replicate(routes,distribution,durations,demand_data,route_index):
 
             #tests for demand and duration
             demand = demand_calc(simulate_route,demand_data,simulate = False)
-            if store != distribution:
+            if (store != 'Distribution North') & (store != 'Distribution South'):
                 duration = duration_calc(simulate_route,durations,route_index,demand_data,scale=False,shift=False)
-            if store == distribution:
+            if (store == 'Distribution North') | (store == 'Distribution South'):
                 duration = 0
 
             if (demand > 20) | (duration > 14400):
