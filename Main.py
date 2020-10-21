@@ -224,7 +224,6 @@ if __name__ == "__main__":
     Locations = pd.read_csv('WarehouseLocations.csv')
     
     
-    
 
     for x in range (2):
         total_cost_simulated = []
@@ -246,16 +245,33 @@ if __name__ == "__main__":
         cost_sort = deepcopy(total_cost_simulated)
         cost_sort.sort()
 
-        density = gaussian_kde(total_cost_simulated)
+        cost_density = gaussian_kde(total_cost_simulated)
         xs = np.linspace(cost_sort[0],cost_sort[-1],200)
-        density.covariance_factor = lambda : .2
-        density._compute_covariance()
-        plt.plot(xs,density(xs))
+        cost_density.covariance_factor = lambda : .2
+        cost_density._compute_covariance()
+        plt.rcParams["figure.figsize"] = (11,8)
+        plt.plot(xs,cost_density(xs), label = "Cost Simulation")
 
-        plt.axvline(x = cost_sort[12], color = 'k')
+        plt.axvline(x = cost_sort[12], color = 'k', label = ("Confidence Interval = [" + '{:.2f}'.format(cost_sort[12]) + " , " + '{:.2f}'.format(cost_sort[487]) + "]"))
         plt.axvline(x = cost_sort[487], color = 'k')
 
-        plt.axvline(x = total_cost[x], color = 'r')
+        plt.axvline(x = total_cost[x], color = 'r', label = ("Expected Cost = $" + '{:.2f}'.format(total_cost[x])))
+
+        if x == 1:
+            plt.title("Cost Simulation of Northern Distribution Closure Delivery Model")
+        else:
+            plt.title("Cost Simulation of Standard Delivery Model")
+        
+        plt.xlabel("Cost ($)")
+        plt.ylabel("Density")
+        plt.legend(loc = 1)
+        
+
+        
+        if x == 1:
+            plt.savefig("NorthernClosureSim.png")
+        else:
+            plt.savefig("StandardSim.png")
         plt.show()
         print(len(route_simulate))
     
