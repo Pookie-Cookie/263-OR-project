@@ -239,8 +239,8 @@ if __name__ == "__main__":
     cost_sort.sort()
 
     density = gaussian_kde(total_cost_simulated)
-    xs = np.linspace(10000,15000,200)
-    density.covariance_factor = lambda : .1
+    xs = np.linspace(cost_sort[0],cost_sort[-1],200)
+    density.covariance_factor = lambda : .2
     density._compute_covariance()
     plt.plot(xs,density(xs))
 

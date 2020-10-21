@@ -78,25 +78,29 @@ def duration_calc(route,duration,route_index,demand_data,scale=None,shift=None):
     """
     
     #initialises duration at 0
-    total_duration = 0
+    driving_duration = 0
+    pallet_duration = 0
 
     #adds value of arc to duration and 10 mins per pallet
     for i in range(len(route)-1):
-        total_duration += duration[route[i]][route_index[route[i+1]]] + 600*demand_data[route[i+1]]
+        driving_duration += duration[route[i]][route_index[route[i+1]]]
+        pallet_duration += 600*demand_data[route[i+1]]
 
     #accounts for return to distribution centre
-    total_duration += duration[route[-1]][route_index[route[0]]]
+    driving_duration += duration[route[-1]][route_index[route[0]]]
     #accounts for unloading at store
     
     #Adds scaling factor for shift
     if scale == True:
-        hours = total_duration/3600
+        hours = (driving_duration+pallet_duration)/3600
         if shift == True:
-            #For routes starting at 8am, we will experience a 25% increase in traffic at 8am and a 25% decrease at 2pm, points between vary linearly
-            total_duration = total_duration * (1+(0.25*hours - hours**2/24))
+            #For routes starting at 8am, we will experience a 20% increase in traffic at 8am and a 25% decrease at 2pm, points between vary linearly
+            driving_duration = driving_duration * (1+(0.2*hours - hours**2/30))
         if shift == False:
-            #For routes starting at 2am, we will experience a 25% decrease in traffic at 2pm and a 25% increase at 8pm, points between vary linearly
-            total_duration = total_duration * (1+(hours**2/24 - 0.25*hours))
+            #For routes starting at 2am, we will experience a 20% decrease in traffic at 2pm and a 25% increase at 8pm, points between vary linearly
+            driving_duration = driving_duration * (1+(hours**2/30 - 0.2*hours))
+
+    total_duration = driving_duration + pallet_duration
 
     return total_duration
     
@@ -514,11 +518,11 @@ def route_replicate(routes,distribution,durations,demand_data,route_index):
 
     for i in range(len(simulate_routes)):
         if i < 25:
-            #calcs duration for 8am shift
-            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=False,shift=True)
-        else:
             #calcs duration for 2pm shift
-            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=False,shift=False)
+            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=True,shift=False)
+        else:
+            #calcs duration for 8am shift
+            route_duration[i]=duration_calc(simulate_routes[i][:-1],durations,route_index,demand_data,scale=True,shift=True)
 
     return simulate_routes, route_duration
 
