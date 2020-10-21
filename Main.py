@@ -223,12 +223,13 @@ if __name__ == "__main__":
     demand_random = deepcopy(demand_data)
     Locations = pd.read_csv('WarehouseLocations.csv')
     
-    
+    sim_size = 10000
 
     for x in range (2):
+        
         total_cost_simulated = []
         #attempts to replicate chosen routes and ammends shortcomings with extra routes
-        for i in range(500):
+        for i in range(sim_size):
             for store in Locations['Store']:
                 if (store != "Distribution North") & (store != "Distribution South"):
                     #simulates random demand prior to function call
@@ -252,10 +253,10 @@ if __name__ == "__main__":
         plt.rcParams["figure.figsize"] = (11,8)
         plt.plot(xs,cost_density(xs), label = "Cost Simulation")
 
-        plt.axvline(x = cost_sort[12], color = 'k', label = ("Confidence Interval = [" + '{:.2f}'.format(cost_sort[12]) + " , " + '{:.2f}'.format(cost_sort[487]) + "]"))
-        plt.axvline(x = cost_sort[487], color = 'k')
-
-        plt.axvline(x = total_cost[x], color = 'r', label = ("Expected Cost = $" + '{:.2f}'.format(total_cost[x])))
+        plt.axvline(x = cost_sort[round(sim_size*0.025)], color = 'k', label = ("Confidence Interval = [" + '{:.2f}'.format(cost_sort[round(sim_size*0.025)]) + " , " + '{:.2f}'.format(cost_sort[round(sim_size*0.975)]) + "]"))
+        plt.axvline(x = cost_sort[round(sim_size*0.975)], color = 'k')
+        plt.axvline(x = cost_sort[round(sim_size*0.5)], color = 'g', label = "Expected cost (with simulation) = $" + '{:.2f}'.format(cost_sort[round(sim_size*0.5)]))
+        plt.axvline(x = total_cost[x], color = 'r', label = ("Optimal Cost (without simulation) = $" + '{:.2f}'.format(total_cost[x])))
 
         if x == 1:
             plt.title("Cost Simulation of Northern Distribution Closure Delivery Model")
