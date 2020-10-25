@@ -46,6 +46,7 @@ demand_summarised
 # Summarise day-by-day avg demands, by location and store
 demand_grouped_loc = group_by(demand_gather,Day,Store,Location)
 demand_summarised_loc = summarise(demand_grouped_loc, Mean_Demand = ceiling(mean(Demand,
-                                                                                 na.rm = TRUE)))
+                                                                                 na.rm = TRUE)),
+                                  Std_Dev = round(sd(Demand, na.rm = TRUE),3))
 
-write.table(demand_avg_clean , file = "dmnd_avgs.csv", row.names = FALSE)
+write.table(demand_summarised_loc , file = "dmnd_avgs.csv", row.names = FALSE)
