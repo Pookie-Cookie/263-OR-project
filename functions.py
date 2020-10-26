@@ -447,6 +447,8 @@ def demand_calc(route,demand_data,simulate = None):
     demand: int
     Number of pallets required to fulfill the input route
     """
+
+
     #sets base demand to 0
     demand = 0
     for store in route:
@@ -454,9 +456,9 @@ def demand_calc(route,demand_data,simulate = None):
         if (store != 'Distribution North') & (store != 'Distribution South'):
             #sums demands
 
-            #For simulation, use estimated store demand & std(rn set to 2)
+            #For simulation, use estimated store demand & std
             if simulate:
-                simu_demand = round(np.random.normal(demand_data[store],2))
+                simu_demand = round(np.random.normal(demand_data[store],demand_data[Std_Dev]))
                 demand += simu_demand
             else: 
                 demand += demand_data[store]

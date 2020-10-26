@@ -11,7 +11,7 @@ if __name__ == "__main__":
     #Load in data for warehouse locations and durations
     Locations = pd.read_csv('WarehouseLocations.csv')
     Durations = pd.read_csv('WarehouseDurations.csv')
-    Demands = pd.read_csv('dmnd_avgs (1).csv')
+    Demands = pd.read_csv('dmnd_avgs_std_dev.csv')
 
     #Generate demand estimates for each node 
     demand_data = generate_demand_estimate(Locations,Demands)
